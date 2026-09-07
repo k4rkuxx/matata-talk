@@ -1,0 +1,36 @@
+name: matata_talk
+description: "MatataTalk: Comunicador Aumentativo y Alternativo (CAA) libre y accesible en honor a Mateo Rafael."
+publish_to: 'none'
+version: 0.1.0+1
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  # Arquitectura y Estado
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.5
+  get_it: ^7.7.0
+  # Síntesis de Voz y Audio
+  flutter_tts: ^4.2.0
+  audioplayers: ^6.1.0
+  # Gráficos y Renderizado de Vectores (ARASAAC)
+  vector_graphics: ^1.1.11+1
+  google_fonts: ^6.2.1
+  # Base de Datos Local y Utilidades
+  path_provider: ^2.1.4
+  path: ^1.9.0
+  shared_preferences: ^2.3.2
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  bloc_test: ^9.1.7
+  mocktail: ^1.0.4
+  vector_graphics_compiler: ^1.1.11+1
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/symbols/
+    - assets/data/
