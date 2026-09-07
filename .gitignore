@@ -1,48 +1,73 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
+# -----------------------------------------------------------------------------
+# FVM (Flutter Version Management)
+# -----------------------------------------------------------------------------
+# Ignorar el symlink local del SDK, pero conservar fvm_config.json / .fvmrc
+.fvm/flutter_sdk
+.fvm_history
 
-# IntelliJ related
+# -----------------------------------------------------------------------------
+# IDEs y Editores
+# -----------------------------------------------------------------------------
+# VS Code: Conservar settings.json para FVM, ignorar el resto
+.vscode/*
+!.vscode/settings.json
+
+# IntelliJ / Android Studio
 *.iml
 *.ipr
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# -----------------------------------------------------------------------------
+# Flutter / Dart / Compilación
+# -----------------------------------------------------------------------------
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
 /build/
 /coverage/
+migrate_working_dir/
 
-# Symbolication related
-app.*.symbols
+# Documentación generada
+**/doc/api/
+**/ios/Flutter/.last_build_id
 
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
+# -----------------------------------------------------------------------------
+# Android & Keystores (Seguridad)
+# -----------------------------------------------------------------------------
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/key.properties
+/android/local.properties
+*.jks
+*.keystore
 
-# Widget Preview related
-.widget_preview/
+# -----------------------------------------------------------------------------
+# iOS & Certificados
+# -----------------------------------------------------------------------------
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/app.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+*.p12
+*.mobileprovision
+
+# -----------------------------------------------------------------------------
+# Sistema Operativo
+# -----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.log
+*.class
+*.pyc
+*.swp
