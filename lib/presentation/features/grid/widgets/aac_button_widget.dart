@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../../domain/models/aac_button.dart';
+import '../../../core/widgets/aac_symbol_widget.dart';
 import '../../../theme/fitzgerald_colors.dart';
 
 class AACButtonWidget extends StatelessWidget {
   final AACButton button;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   const AACButtonWidget({
     super.key,
     required this.button,
     required this.onTap,
+    this.onLongPress,
   });
 
   @override
@@ -20,6 +23,7 @@ class AACButtonWidget extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(12),
         child: Ink(
           decoration: BoxDecoration(
@@ -42,13 +46,15 @@ class AACButtonWidget extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Pictograma o Emoji
+                // Pictograma ARASAAC / Vector / Emoji
                 Expanded(
                   flex: 3,
                   child: Center(
-                    child: Text(
-                      button.iconEmoji ?? '💬',
-                      style: const TextStyle(fontSize: 32),
+                    child: AACSymbolWidget(
+                      assetPath: button.symbolAssetPath,
+                      arasaacId: button.arasaacId,
+                      fallbackEmoji: button.iconEmoji,
+                      size: 42,
                     ),
                   ),
                 ),

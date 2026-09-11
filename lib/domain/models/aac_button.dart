@@ -8,11 +8,12 @@ class AACButton extends Equatable {
   final int col;
   final String label;
   final String? vocalizationText;
-  final String? iconEmoji;       // Emoji representativo (prototipo)
-  final String? symbolAssetPath; // Ruta al pictograma ARASAAC
+  final String? iconEmoji;
+  final String? symbolAssetPath;
+  final int? arasaacId; // ID oficial del pictograma en ARASAAC
   final PartOfSpeech partOfSpeech;
   final ButtonActionType actionType;
-  final String? targetBoardId;   // ID del tablero si es carpeta
+  final String? targetBoardId;
 
   const AACButton({
     required this.id,
@@ -22,6 +23,7 @@ class AACButton extends Equatable {
     this.vocalizationText,
     this.iconEmoji,
     this.symbolAssetPath,
+    this.arasaacId,
     required this.partOfSpeech,
     this.actionType = ButtonActionType.speakAndAddToMessage,
     this.targetBoardId,
@@ -38,6 +40,7 @@ class AACButton extends Equatable {
         vocalizationText,
         iconEmoji,
         symbolAssetPath,
+        arasaacId,
         partOfSpeech,
         actionType,
         targetBoardId,
