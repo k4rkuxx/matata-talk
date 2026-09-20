@@ -6,11 +6,13 @@ import 'aac_button_widget.dart';
 class MotorGridView extends StatelessWidget {
   final AACBoard board;
   final Function(AACButton) onButtonTap;
+  final Function(AACButton)? onButtonLongPress;
 
   const MotorGridView({
     super.key,
     required this.board,
     required this.onButtonTap,
+    this.onButtonLongPress,
   });
 
   @override
@@ -19,7 +21,7 @@ class MotorGridView extends StatelessWidget {
       builder: (context, constraints) {
         return GridView.builder(
           padding: const EdgeInsets.all(8),
-          physics: const NeverScrollableScrollPhysics(), // Fijo, sin scroll accidental
+          physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: board.columns,
             crossAxisSpacing: 8,
@@ -34,13 +36,15 @@ class MotorGridView extends StatelessWidget {
             final button = board.getButtonAt(row, col);
 
             if (button == null) {
-              // Espacio reservado para memoria motora
               return const SizedBox.shrink();
             }
 
             return AACButtonWidget(
               button: button,
               onTap: () => onButtonTap(button),
+              onLongPress: onButtonLongPress != null
+                  ? () => onButtonLongPress!(button)
+                  : null,
             );
           },
         );

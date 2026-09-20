@@ -1,10 +1,11 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'data/services/tts_service.dart';
-import 'presentation/features/communicator/screens/communicator_screen.dart';
 import 'presentation/features/grid/bloc/grid_bloc.dart';
 import 'presentation/features/message_bar/bloc/message_bar_bloc.dart';
+import 'presentation/features/splash/screens/splash_screen.dart'; // <-- IMPORTANTE
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +43,7 @@ class MatataTalkApp extends StatelessWidget {
           ),
           textTheme: GoogleFonts.outfitTextTheme(),
         ),
-        home: const CommunicatorScreen(),
+        home: const SplashScreen(), // <-- DEBE SER SplashScreen()
       ),
     );
   }

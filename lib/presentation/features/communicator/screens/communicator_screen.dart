@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../domain/models/aac_button.dart';
 import '../../../../domain/models/button_action.dart';
+import '../../../../domain/models/part_of_speech.dart';
+import '../../grammar_popup/widgets/morphology_popup_dialog.dart';
 import '../../grid/bloc/grid_bloc.dart';
 import '../../grid/widgets/motor_grid_view.dart';
 import '../../message_bar/bloc/message_bar_bloc.dart';
@@ -30,8 +32,27 @@ class CommunicatorScreen extends StatelessWidget {
         context.read<MessageBarBloc>().add(RemoveLastToken());
         break;
       case ButtonActionType.grammarPopup:
-        // Se implementará en la siguiente fase
+        _handleButtonLongPress(context, button);
         break;
+    }
+  }
+
+  void _handleButtonLongPress(BuildContext context, AACButton button) {
+    // Solo abrimos morfología para verbos, sustantivos o adjetivos
+    if (button.partOfSpeech == PartOfSpeech.verb ||
+        button.partOfSpeech == PartOfSpeech.noun ||
+        button.partOfSpeech == PartOfSpeech.adjective) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => MorphologyPopupDialog(
+          button: button,
+          onSelectInflection: (inflectedButton) {
+            context
+                .read<MessageBarBloc>()
+                .add(AddButtonToMessage(inflectedButton));
+          },
+        ),
+      );
     }
   }
 
@@ -69,25 +90,22 @@ class CommunicatorScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             tooltip: 'Configuración',
-            onPressed: () {
-              // Configuración de perfiles y accesibilidad
-            },
+            onPressed: () {},
           ),
         ],
       ),
       body: SafeArea(
         child: Column(
           children: [
-            // 1. Barra de Mensajes y Reproducción de Voz
             const MessageBarView(),
-
-            // 2. Cuadrícula de Comunicación con Memoria Motora
             Expanded(
               child: BlocBuilder<GridBloc, GridState>(
                 builder: (context, state) {
                   return MotorGridView(
                     board: state.currentBoard,
                     onButtonTap: (button) => _handleButtonTap(context, button),
+                    onButtonLongPress: (button) =>
+                        _handleButtonLongPress(context, button),
                   );
                 },
               ),
