@@ -32,15 +32,19 @@ Plan de ejecución estructurado por fases para llevar a **MatataTalk** desde el 
 
 ---
 
-## 📍 Fase 4: Accesibilidad Universal & Métodos de Acceso (En progreso - 60%)
+## 📍 Fase 4: Accesibilidad Universal & Métodos de Acceso ✅ (100%)
 - [x] Filtros táctiles avanzados: tiempo mínimo de retención (*hold time*) con animación circular de progreso.
 - [x] Filtro anti-rebote (*Debounce*) para evitar dobles pulsaciones involuntarias.
 - [x] Modo de activación al pulsar (*Touch Down*) y al soltar (*Release to Activate*).
 - [x] Diálogo interactivo de ajustes táctiles (`TouchAccessibilityDialog`) con zona de pruebas en vivo.
 - [x] Persistencia local de ajustes de accesibilidad (`SharedPreferences`).
-- [ ] Motor de barrido por conmutadores (*Switch Scanning*) para 1 y 2 conmutadores Bluetooth.
-- [ ] Barrido auditivo con retroalimentación acústica previa.
-- [ ] Prototipo de puntero facial (*Head Tracking*) usando la cámara frontal y MediaPipe.
+- [x] Motor de barrido por conmutadores (*Switch Scanning*): `ScanningEngine`, `ScanningBloc`, `ScanningInputHandler` (1 conmutador: Automático, 2 conmutadores: Paso a paso, Inverso).
+- [x] Patrones Fila→Columna y Lineal con cursor ámbar clínico y tinte de fila completa.
+- [x] `ScanningSettingsDialog` con velocidad, loops, cue auditivo, beep acústico y pantalla-como-conmutador.
+- [x] Persistencia completa del estado de barrido (`SharedPreferences`).
+- [x] Recepción de eventos de teclado físico (Bluetooth/USB) via `KeyboardListener`.
+- [x] Barrido auditivo con retroalimentación acústica previa (`enableAuditoryCue` con TTS adaptado + `enableAcousticBeep` de 80ms a 880Hz en baja latencia).
+- [x] Prototipo de puntero facial (*Head Tracking*) usando la cámara frontal y Google ML Kit Face Detection con ángulos Euler (Pitch/Yaw), filtro pasa-bajos anti-temblor, fijación visual (*Dwell Time*) con anillo animado de progreso, calibración en vivo y miniatura PIP opcional.
 
 ---
 

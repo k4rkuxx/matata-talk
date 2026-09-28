@@ -10,7 +10,12 @@ class AACButtonWidget extends StatelessWidget {
   final AACButton button;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
-  final bool isHighlighted; // True cuando el Pathfinder está guiando al usuario
+  /// True cuando el Pathfinder está guiando al usuario (azul)
+  final bool isHighlighted;
+  /// True cuando el cursor de barrido está exactamente sobre este botón (ámbar)
+  final bool isScanHighlighted;
+  /// True cuando el cursor de barrido resalta la fila entera (ámbar suave)
+  final bool isRowScanHighlighted;
 
   const AACButtonWidget({
     super.key,
@@ -18,12 +23,59 @@ class AACButtonWidget extends StatelessWidget {
     required this.onTap,
     this.onLongPress,
     this.isHighlighted = false,
+    this.isScanHighlighted = false,
+    this.isRowScanHighlighted = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final bgColor = FitzgeraldColors.getColor(button.partOfSpeech);
     final touchSettings = context.watch<TouchSettingsBloc>().state.settings;
+
+    // Colores de resaltado
+    const pathfinderBlue = Color(0xFF0D47A1);
+    const scanAmber = Color(0xFFFF8F00);
+    const scanAmberRow = Color(0xFFFFA000);
+
+    final borderColor = isScanHighlighted
+        ? scanAmber
+        : isHighlighted
+            ? pathfinderBlue
+            : isRowScanHighlighted
+                ? scanAmberRow
+                : Colors.black.withValues(alpha: 0.15);
+
+    final borderWidth = isScanHighlighted
+        ? 4.0
+        : isHighlighted
+            ? 4.0
+            : isRowScanHighlighted
+                ? 3.0
+                : 2.0;
+
+    final shadowColor = isScanHighlighted
+        ? scanAmber.withValues(alpha: 0.65)
+        : isHighlighted
+            ? const Color(0xFF1976D2).withValues(alpha: 0.6)
+            : isRowScanHighlighted
+                ? scanAmberRow.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.08);
+
+    final blurRadius = (isScanHighlighted || isHighlighted) ? 12.0 : isRowScanHighlighted ? 8.0 : 4.0;
+    final spreadRadius = (isScanHighlighted || isHighlighted) ? 2.0 : 0.0;
+
+    final labelColor = isScanHighlighted
+        ? scanAmber
+        : isHighlighted
+            ? pathfinderBlue
+            : const Color(0xFF1E1E1E);
+
+    final iconSize = (isScanHighlighted || isHighlighted) ? 46.0 : 42.0;
+
+    // Fondo con tinte ámbar suave cuando la fila está seleccionada
+    final effectiveBg = isRowScanHighlighted && !isScanHighlighted
+        ? Color.lerp(bgColor, scanAmberRow, 0.15)!
+        : bgColor;
 
     return AccessibleTouchWrapper(
       settings: touchSettings,
@@ -32,23 +84,16 @@ class AACButtonWidget extends StatelessWidget {
       onTap: onTap,
       onLongPress: onLongPress,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 180),
         decoration: BoxDecoration(
-          color: bgColor,
+          color: effectiveBg,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isHighlighted
-                ? const Color(0xFF0D47A1) // Azul brillante de guía
-                : Colors.black.withValues(alpha: 0.15),
-            width: isHighlighted ? 4 : 2,
-          ),
+          border: Border.all(color: borderColor, width: borderWidth),
           boxShadow: [
             BoxShadow(
-              color: isHighlighted
-                  ? const Color(0xFF1976D2).withValues(alpha: 0.6)
-                  : Colors.black.withValues(alpha: 0.08),
-              blurRadius: isHighlighted ? 12 : 4,
-              spreadRadius: isHighlighted ? 2 : 0,
+              color: shadowColor,
+              blurRadius: blurRadius,
+              spreadRadius: spreadRadius,
               offset: const Offset(0, 2),
             ),
           ],
@@ -65,7 +110,7 @@ class AACButtonWidget extends StatelessWidget {
                     assetPath: button.symbolAssetPath,
                     arasaacId: button.arasaacId,
                     fallbackEmoji: button.iconEmoji,
-                    size: isHighlighted ? 46 : 42,
+                    size: iconSize,
                   ),
                 ),
               ),
@@ -79,9 +124,7 @@ class AACButtonWidget extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: isHighlighted
-                          ? const Color(0xFF0D47A1)
-                          : const Color(0xFF1E1E1E),
+                      color: labelColor,
                       letterSpacing: 0.3,
                     ),
                     textAlign: TextAlign.center,

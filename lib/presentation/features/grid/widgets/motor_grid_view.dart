@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../domain/models/aac_board.dart';
 import '../../../../domain/models/aac_button.dart';
+import '../../scanning/controller/scanning_engine.dart';
 import 'aac_button_widget.dart';
 
 class MotorGridView extends StatelessWidget {
@@ -8,6 +9,8 @@ class MotorGridView extends StatelessWidget {
   final String? highlightedButtonId;
   final Function(AACButton) onButtonTap;
   final Function(AACButton)? onButtonLongPress;
+  /// Estado del cursor de barrido (null = barrido inactivo)
+  final ScanCursorState? scanCursor;
 
   const MotorGridView({
     super.key,
@@ -15,6 +18,7 @@ class MotorGridView extends StatelessWidget {
     this.highlightedButtonId,
     required this.onButtonTap,
     this.onButtonLongPress,
+    this.scanCursor,
   });
 
   @override
@@ -41,9 +45,14 @@ class MotorGridView extends StatelessWidget {
               return const SizedBox.shrink();
             }
 
+            final isScanHighlighted = scanCursor?.isHighlighted(row, col) ?? false;
+            final isRowScanHighlighted = scanCursor?.isRowHighlighted(row) ?? false;
+
             return AACButtonWidget(
               button: button,
               isHighlighted: button.id == highlightedButtonId,
+              isScanHighlighted: isScanHighlighted,
+              isRowScanHighlighted: isRowScanHighlighted,
               onTap: () => onButtonTap(button),
               onLongPress: onButtonLongPress != null ? () => onButtonLongPress!(button) : null,
             );
