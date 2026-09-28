@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../data/database/app_database.dart';
 import '../../../../data/datasources/default_vocabulary.dart';
 import '../../../../domain/services/pathfinder_service.dart';
 import '../../../core/widgets/aac_symbol_widget.dart';
@@ -22,6 +23,21 @@ class _WordFinderDialogState extends State<WordFinderDialog> {
   void initState() {
     super.initState();
     _pathfinder = PathfinderService(boards: DefaultVocabulary.allBoards);
+    _loadOfflineBoards();
+  }
+
+  Future<void> _loadOfflineBoards() async {
+    try {
+      final boards = await AppDatabase.getAllBoards();
+      if (mounted && boards.isNotEmpty) {
+        setState(() {
+          _pathfinder = PathfinderService(boards: boards);
+          if (_searchController.text.isNotEmpty) {
+            _results = _pathfinder.searchWords(_searchController.text);
+          }
+        });
+      }
+    } catch (_) {}
   }
 
   void _onSearchChanged(String query) {

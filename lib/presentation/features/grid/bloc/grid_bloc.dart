@@ -1,7 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../data/datasources/board_local_datasource.dart';
 import '../../../../data/datasources/default_vocabulary.dart';
 import '../../../../domain/models/aac_board.dart';
+import '../../../../domain/repositories/vocabulary_repository.dart';
 
 // Eventos
 abstract class GridEvent extends Equatable {
@@ -60,24 +62,29 @@ class GridState extends Equatable {
 
 // BLoC
 class GridBloc extends Bloc<GridEvent, GridState> {
-  GridBloc()
-      : super(GridState(currentBoard: DefaultVocabulary.getHomeBoard())) {
+  final VocabularyRepository repository;
+
+  GridBloc({VocabularyRepository? repository})
+      : repository = repository ?? LocalVocabularyRepository(),
+        super(GridState(currentBoard: DefaultVocabulary.getHomeBoard())) {
     on<LoadBoard>(_onLoadBoard);
     on<NavigateHome>(_onNavigateHome);
     on<SetHighlightButtonId>(_onSetHighlight);
   }
 
-  void _onLoadBoard(LoadBoard event, Emitter<GridState> emit) {
-    final newBoard = DefaultVocabulary.getBoardById(event.boardId);
+  Future<void> _onLoadBoard(LoadBoard event, Emitter<GridState> emit) async {
+    final board = await repository.getBoard(event.boardId);
+    final newBoard = board ?? DefaultVocabulary.getBoardById(event.boardId);
     emit(state.copyWith(
       currentBoard: newBoard,
       navigationHistory: [...state.navigationHistory, state.currentBoard.id],
     ));
   }
 
-  void _onNavigateHome(NavigateHome event, Emitter<GridState> emit) {
+  Future<void> _onNavigateHome(NavigateHome event, Emitter<GridState> emit) async {
+    final home = await repository.getBoard('home_board');
     emit(state.copyWith(
-      currentBoard: DefaultVocabulary.getHomeBoard(),
+      currentBoard: home ?? DefaultVocabulary.getHomeBoard(),
       navigationHistory: [],
     ));
   }

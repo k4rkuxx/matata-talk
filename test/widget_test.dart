@@ -1,5 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matata_talk/domain/grammar/spanish_grammar_engine.dart';
+import 'package:matata_talk/domain/models/quick_phrase.dart';
+import 'package:matata_talk/domain/models/quick_phrase_category.dart';
+import 'package:matata_talk/domain/models/phrase_history_item.dart';
 import 'package:matata_talk/domain/models/touch_settings.dart';
 import 'package:matata_talk/domain/services/pathfinder_service.dart';
 import 'package:matata_talk/data/datasources/default_vocabulary.dart';
@@ -53,6 +56,36 @@ void main() {
       final json = custom.toJson();
       final reconstructed = TouchSettings.fromJson(json);
       expect(reconstructed, equals(custom));
+    });
+  });
+
+  group('Phrases Domain Tests', () {
+    test('QuickPhrase JSON serialization works', () {
+      final phrase = QuickPhrase(
+        id: 'qp_test',
+        text: 'Quiero agua',
+        iconEmoji: '💧',
+        category: QuickPhraseCategory.basicNeeds,
+        isFavorite: true,
+        createdAt: DateTime(2026, 9, 28),
+      );
+
+      final json = phrase.toJson();
+      final reconstructed = QuickPhrase.fromJson(json);
+      expect(reconstructed, equals(phrase));
+    });
+
+    test('PhraseHistoryItem JSON serialization works', () {
+      final history = PhraseHistoryItem(
+        id: 'hist_1',
+        text: 'Hola mamá',
+        spokenAt: DateTime(2026, 9, 28, 10, 30),
+        isFavorite: false,
+      );
+
+      final json = history.toJson();
+      final reconstructed = PhraseHistoryItem.fromJson(json);
+      expect(reconstructed, equals(history));
     });
   });
 }

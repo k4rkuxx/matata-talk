@@ -4,7 +4,7 @@ Plan de ejecución estructurado por fases para llevar a **MatataTalk** desde el 
 
 ---
 
-## 📍 Fase 1: Motor Base & Cuadrícula Motora (MVP Funcional)
+## 📍 Fase 1: Motor Base & Cuadrícula Motora (MVP Funcional) ✅ (100%)
 - [x] Configuración del proyecto con FVM y arquitectura Clean.
 - [x] Modelos de dominio: `AACBoard`, `AACButton`, `MessageToken`, `PartOfSpeech`.
 - [x] Paleta de colores estándar Fitzgerald Modificado.
@@ -15,7 +15,7 @@ Plan de ejecución estructurado por fases para llevar a **MatataTalk** desde el 
 
 ---
 
-## 📍 Fase 2: Motor Morfológico & Gramática Dinámica
+## 📍 Fase 2: Motor Morfológico & Gramática Dinámica ✅ (100%)
 - [x] Implementación de `SpanishGrammarEngine` (conjugador regular e irregular).
 - [x] Widget de matriz emergente (*Morphology Popup*) activado por pulsación prolongada (*Long-Press*).
 - [x] Reglas de pluralización automática para sustantivos.
@@ -23,16 +23,16 @@ Plan de ejecución estructurado por fases para llevar a **MatataTalk** desde el 
 
 ---
 
-## 📍 Fase 3: Navegación Avanzada & Buscador Guiado (*Path Finder*)
+## 📍 Fase 3: Navegación Avanzada, Buscador Guiado & Persistencia Offline ✅ (100%)
 - [x] Algoritmo de búsqueda de rutas en grafo para palabras profundas (`PathfinderService`).
 - [x] Modal de búsqueda en tiempo real (`WordFinderDialog`) con vista previa de pictogramas y ruta motora.
 - [x] Modo Guía paso a paso con halo azul visual (`SetHighlightButtonId`) en la cuadrícula motora.
-- [ ] Base de datos local **Drift (SQLite)** con soporte **FTS5** para indexar vocabulario offline.
-- [ ] Historial de frases y panel de "Frases Rápidas" de uso frecuente.
+- [x] Historial de frases habladas y panel de "Frases Rápidas" de uso frecuente (`QuickPhrasesDialog` y `PhrasesBloc`).
+- [x] Base de datos local **SQLite (`AppDatabase`)** con soporte **FTS (Full-Text Search)** e indexación de vocabulario 100% offline.
 
 ---
 
-## 📍 Fase 4: Accesibilidad Universal & Métodos de Acceso
+## 📍 Fase 4: Accesibilidad Universal & Métodos de Acceso (En progreso - 60%)
 - [x] Filtros táctiles avanzados: tiempo mínimo de retención (*hold time*) con animación circular de progreso.
 - [x] Filtro anti-rebote (*Debounce*) para evitar dobles pulsaciones involuntarias.
 - [x] Modo de activación al pulsar (*Touch Down*) y al soltar (*Release to Activate*).

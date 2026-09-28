@@ -9,6 +9,8 @@ import '../../grid/bloc/grid_bloc.dart';
 import '../../grid/widgets/motor_grid_view.dart';
 import '../../message_bar/bloc/message_bar_bloc.dart';
 import '../../message_bar/widgets/message_bar_view.dart';
+import '../../phrases/bloc/phrases_bloc.dart';
+import '../../phrases/widgets/quick_phrases_dialog.dart';
 import '../../settings/widgets/touch_accessibility_dialog.dart';
 import '../../word_finder/widgets/word_finder_dialog.dart';
 
@@ -113,82 +115,127 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFECEFF1),
-      appBar: AppBar(
-        title: BlocBuilder<GridBloc, GridState>(
-          builder: (context, state) {
-            return Row(
-              children: [
-                const Text(
-                  'MatataTalk',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 12),
-                Chip(
-                  label: Text(
-                    state.currentBoard.name,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+    return BlocListener<MessageBarBloc, MessageBarState>(
+      listenWhen: (previous, current) =>
+          !previous.isSpeaking && current.isSpeaking && current.tokens.isNotEmpty,
+      listener: (context, state) {
+        // Registrar automáticamente la frase en el historial cuando se reproduce
+        context.read<PhrasesBloc>().add(RecordSpokenPhrase(state.fullText));
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFECEFF1),
+        appBar: AppBar(
+          titleSpacing: 12,
+          title: BlocBuilder<GridBloc, GridState>(
+            builder: (context, state) {
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'MatataTalk',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
                   ),
-                  backgroundColor: Colors.white70,
-                ),
-              ],
-            );
-          },
-        ),
-        actions: [
-          // Botón del Buscador Guiado
-          IconButton(
-            icon: const Icon(Icons.search, size: 28),
-            tooltip: 'Buscar pictograma',
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (dContext) => WordFinderDialog(
-                  onSelectWordPath: (pathResult) => _startPathfinderGuide(pathResult),
-                ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        state.currentBoard.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                          color: Color(0xFF1565C0),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
               );
             },
           ),
-          // Botón de Filtros Táctiles y Accesibilidad
-          IconButton(
-            icon: const Icon(Icons.touch_app_outlined, size: 26),
-            tooltip: 'Filtros Táctiles y Accesibilidad',
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (dContext) => const TouchAccessibilityDialog(),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.home_outlined),
-            tooltip: 'Ir a Inicio',
-            onPressed: () {
-              _clearPathfinder(context);
-              context.read<GridBloc>().add(NavigateHome());
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const MessageBarView(),
-            Expanded(
-              child: BlocBuilder<GridBloc, GridState>(
-                builder: (context, state) {
-                  return MotorGridView(
-                    board: state.currentBoard,
-                    highlightedButtonId: state.highlightedButtonId,
-                    onButtonTap: (button) => _handleButtonTap(context, button),
-                    onButtonLongPress: (button) =>
-                        _handleButtonLongPress(context, button),
-                  );
-                },
-              ),
+          actions: [
+            // Botón de Frases Rápidas e Historial
+            IconButton(
+              icon: const Icon(Icons.forum_outlined, size: 24),
+              tooltip: 'Frases Rápidas e Historial',
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              constraints: const BoxConstraints(),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (dContext) => QuickPhrasesDialog(
+                    ttsService: context.read<MessageBarBloc>().ttsService,
+                  ),
+                );
+              },
+            ),
+            // Botón del Buscador Guiado
+            IconButton(
+              icon: const Icon(Icons.search, size: 24),
+              tooltip: 'Buscar pictograma',
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              constraints: const BoxConstraints(),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (dContext) => WordFinderDialog(
+                    onSelectWordPath: (pathResult) =>
+                        _startPathfinderGuide(pathResult),
+                  ),
+                );
+              },
+            ),
+            // Botón de Filtros Táctiles y Accesibilidad
+            IconButton(
+              icon: const Icon(Icons.touch_app_outlined, size: 24),
+              tooltip: 'Filtros Táctiles y Accesibilidad',
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              constraints: const BoxConstraints(),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (dContext) => const TouchAccessibilityDialog(),
+                );
+              },
+            ),
+            // Botón de Inicio
+            IconButton(
+              icon: const Icon(Icons.home_outlined, size: 24),
+              tooltip: 'Ir a Inicio',
+              padding: const EdgeInsets.only(left: 6, right: 12),
+              constraints: const BoxConstraints(),
+              onPressed: () {
+                _clearPathfinder(context);
+                context.read<GridBloc>().add(NavigateHome());
+              },
             ),
           ],
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              const MessageBarView(),
+              Expanded(
+                child: BlocBuilder<GridBloc, GridState>(
+                  builder: (context, state) {
+                    return MotorGridView(
+                      board: state.currentBoard,
+                      highlightedButtonId: state.highlightedButtonId,
+                      onButtonTap: (button) => _handleButtonTap(context, button),
+                      onButtonLongPress: (button) =>
+                          _handleButtonLongPress(context, button),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

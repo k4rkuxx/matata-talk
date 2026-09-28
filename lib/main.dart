@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'data/datasources/phrase_datasource.dart';
 import 'data/datasources/settings_datasource.dart';
 import 'data/services/tts_service.dart';
 import 'presentation/features/grid/bloc/grid_bloc.dart';
 import 'presentation/features/message_bar/bloc/message_bar_bloc.dart';
+import 'presentation/features/phrases/bloc/phrases_bloc.dart';
 import 'presentation/features/settings/bloc/touch_settings_bloc.dart';
 import 'presentation/features/splash/screens/splash_screen.dart';
 
@@ -36,6 +38,11 @@ class MatataTalkApp extends StatelessWidget {
           create: (_) => TouchSettingsBloc(
             dataSource: SharedPreferencesSettingsDataSource(),
           )..add(const LoadTouchSettings()),
+        ),
+        BlocProvider(
+          create: (_) => PhrasesBloc(
+            dataSource: SharedPreferencesPhraseDataSource(),
+          )..add(const LoadPhrases()),
         ),
       ],
       child: MaterialApp(
