@@ -52,14 +52,17 @@ class MorphologyPopupDialog extends StatelessWidget {
                     size: 38,
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    'Formas de "${c.infinitive.toUpperCase()}"',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      'Formas de "${c.infinitive.toUpperCase()}"',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.of(context).pop(),
@@ -129,14 +132,17 @@ class MorphologyPopupDialog extends StatelessWidget {
                   size: 38,
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  'Formas de "${button.label}"',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    'Formas de "${button.label}"',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.of(context).pop(),

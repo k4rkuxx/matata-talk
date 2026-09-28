@@ -5,12 +5,14 @@ import 'aac_button_widget.dart';
 
 class MotorGridView extends StatelessWidget {
   final AACBoard board;
+  final String? highlightedButtonId;
   final Function(AACButton) onButtonTap;
   final Function(AACButton)? onButtonLongPress;
 
   const MotorGridView({
     super.key,
     required this.board,
+    this.highlightedButtonId,
     required this.onButtonTap,
     this.onButtonLongPress,
   });
@@ -41,10 +43,9 @@ class MotorGridView extends StatelessWidget {
 
             return AACButtonWidget(
               button: button,
+              isHighlighted: button.id == highlightedButtonId,
               onTap: () => onButtonTap(button),
-              onLongPress: onButtonLongPress != null
-                  ? () => onButtonLongPress!(button)
-                  : null,
+              onLongPress: onButtonLongPress != null ? () => onButtonLongPress!(button) : null,
             );
           },
         );

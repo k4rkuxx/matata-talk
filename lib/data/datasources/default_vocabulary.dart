@@ -8,6 +8,19 @@ class DefaultVocabulary {
   static const String foodBoardId = 'food_board';
   static const String actionsBoardId = 'actions_board';
   static const String feelingsBoardId = 'feelings_board';
+  static const String toysBoardId = 'toys_board';
+
+  static final Map<String, AACBoard> allBoards = {
+    homeBoardId: getHomeBoard(),
+    foodBoardId: getFoodBoard(),
+    actionsBoardId: getActionsBoard(),
+    feelingsBoardId: getFeelingsBoard(),
+    toysBoardId: getToysBoard(),
+  };
+
+  static AACBoard getBoardById(String id) {
+    return allBoards[id] ?? getHomeBoard();
+  }
 
   static AACBoard getHomeBoard() {
     return const AACBoard(
@@ -16,13 +29,14 @@ class DefaultVocabulary {
       rows: 4,
       columns: 6,
       buttons: [
-        // Fila 0: Pronombres, Negación y Ayuda
+        // Fila 0: Pronombres, Negación, Afirmación y Ayuda
         AACButton(
           id: 'btn_yo',
           row: 0,
           col: 0,
           label: 'Yo',
           iconEmoji: '👤',
+          arasaacId: 2347,
           partOfSpeech: PartOfSpeech.pronoun,
         ),
         AACButton(
@@ -31,6 +45,7 @@ class DefaultVocabulary {
           col: 1,
           label: 'Tú',
           iconEmoji: '👉',
+          arasaacId: 34185,
           partOfSpeech: PartOfSpeech.pronoun,
         ),
         AACButton(
@@ -39,6 +54,7 @@ class DefaultVocabulary {
           col: 2,
           label: 'No',
           iconEmoji: '🚫',
+          arasaacId: 5539,
           partOfSpeech: PartOfSpeech.important,
         ),
         AACButton(
@@ -47,6 +63,7 @@ class DefaultVocabulary {
           col: 3,
           label: 'Sí',
           iconEmoji: '✅',
+          arasaacId: 5587,
           partOfSpeech: PartOfSpeech.social,
         ),
         AACButton(
@@ -55,6 +72,7 @@ class DefaultVocabulary {
           col: 4,
           label: 'Más',
           iconEmoji: '➕',
+          arasaacId: 2566,
           partOfSpeech: PartOfSpeech.adjective,
         ),
         AACButton(
@@ -63,16 +81,18 @@ class DefaultVocabulary {
           col: 5,
           label: 'Ayuda',
           iconEmoji: '🆘',
+          arasaacId: 2349,
           partOfSpeech: PartOfSpeech.important,
         ),
 
-        // Fila 1: Verbos Principales (Core Verbs)
+        // Fila 1: Verbos Núcleo
         AACButton(
           id: 'btn_quiero',
           row: 1,
           col: 0,
           label: 'Quiero',
           iconEmoji: '🤲',
+          arasaacId: 27230,
           partOfSpeech: PartOfSpeech.verb,
         ),
         AACButton(
@@ -81,6 +101,7 @@ class DefaultVocabulary {
           col: 1,
           label: 'Ir',
           iconEmoji: '🚶',
+          arasaacId: 2418,
           partOfSpeech: PartOfSpeech.verb,
         ),
         AACButton(
@@ -89,6 +110,7 @@ class DefaultVocabulary {
           col: 2,
           label: 'Comer',
           iconEmoji: '🍽️',
+          arasaacId: 2373,
           partOfSpeech: PartOfSpeech.verb,
         ),
         AACButton(
@@ -97,6 +119,7 @@ class DefaultVocabulary {
           col: 3,
           label: 'Beber',
           iconEmoji: '🥤',
+          arasaacId: 2378,
           partOfSpeech: PartOfSpeech.verb,
         ),
         AACButton(
@@ -105,6 +128,7 @@ class DefaultVocabulary {
           col: 4,
           label: 'Jugar',
           iconEmoji: '🧸',
+          arasaacId: 2424,
           partOfSpeech: PartOfSpeech.verb,
         ),
         AACButton(
@@ -113,16 +137,18 @@ class DefaultVocabulary {
           col: 5,
           label: 'Parar',
           iconEmoji: '🛑',
+          arasaacId: 6019,
           partOfSpeech: PartOfSpeech.important,
         ),
 
-        // Fila 2: Adjetivos y Estados
+        // Fila 2: Adjetivos y Descriptores
         AACButton(
           id: 'btn_bueno',
           row: 2,
           col: 0,
           label: 'Bueno',
           iconEmoji: '👍',
+          arasaacId: 6944,
           partOfSpeech: PartOfSpeech.adjective,
         ),
         AACButton(
@@ -131,6 +157,7 @@ class DefaultVocabulary {
           col: 1,
           label: 'Malo',
           iconEmoji: '👎',
+          arasaacId: 6945,
           partOfSpeech: PartOfSpeech.adjective,
         ),
         AACButton(
@@ -139,6 +166,7 @@ class DefaultVocabulary {
           col: 2,
           label: 'Feliz',
           iconEmoji: '😊',
+          arasaacId: 2950,
           partOfSpeech: PartOfSpeech.adjective,
         ),
         AACButton(
@@ -147,6 +175,7 @@ class DefaultVocabulary {
           col: 3,
           label: 'Triste',
           iconEmoji: '😢',
+          arasaacId: 2954,
           partOfSpeech: PartOfSpeech.adjective,
         ),
         AACButton(
@@ -155,6 +184,7 @@ class DefaultVocabulary {
           col: 4,
           label: 'Grande',
           iconEmoji: '🐘',
+          arasaacId: 5885,
           partOfSpeech: PartOfSpeech.adjective,
         ),
         AACButton(
@@ -163,16 +193,18 @@ class DefaultVocabulary {
           col: 5,
           label: 'Pequeño',
           iconEmoji: '🐜',
+          arasaacId: 5886,
           partOfSpeech: PartOfSpeech.adjective,
         ),
 
-        // Fila 3: Carpetas y Categorías (Fringe Navigation)
+        // Fila 3: Navegación de Carpetas y Fórmulas Sociales
         AACButton(
           id: 'btn_folder_comida',
           row: 3,
           col: 0,
           label: 'Comida 📁',
           iconEmoji: '🍎',
+          arasaacId: 2373,
           partOfSpeech: PartOfSpeech.noun,
           actionType: ButtonActionType.navigateToBoard,
           targetBoardId: foodBoardId,
@@ -183,6 +215,7 @@ class DefaultVocabulary {
           col: 1,
           label: 'Acciones 📁',
           iconEmoji: '🏃',
+          arasaacId: 2418,
           partOfSpeech: PartOfSpeech.verb,
           actionType: ButtonActionType.navigateToBoard,
           targetBoardId: actionsBoardId,
@@ -193,17 +226,21 @@ class DefaultVocabulary {
           col: 2,
           label: 'Emociones 📁',
           iconEmoji: '❤️',
+          arasaacId: 2950,
           partOfSpeech: PartOfSpeech.social,
           actionType: ButtonActionType.navigateToBoard,
           targetBoardId: feelingsBoardId,
         ),
         AACButton(
-          id: 'btn_bano',
+          id: 'btn_folder_juguetes',
           row: 3,
           col: 3,
-          label: 'Baño',
-          iconEmoji: '🚽',
+          label: 'Juguetes 📁',
+          iconEmoji: '🎮',
+          arasaacId: 2424,
           partOfSpeech: PartOfSpeech.noun,
+          actionType: ButtonActionType.navigateToBoard,
+          targetBoardId: toysBoardId,
         ),
         AACButton(
           id: 'btn_hola',
@@ -211,6 +248,7 @@ class DefaultVocabulary {
           col: 4,
           label: 'Hola',
           iconEmoji: '👋',
+          arasaacId: 6023,
           partOfSpeech: PartOfSpeech.social,
         ),
         AACButton(
@@ -219,6 +257,7 @@ class DefaultVocabulary {
           col: 5,
           label: 'Gracias',
           iconEmoji: '🙏',
+          arasaacId: 6026,
           partOfSpeech: PartOfSpeech.social,
         ),
       ],
@@ -232,7 +271,6 @@ class DefaultVocabulary {
       rows: 4,
       columns: 6,
       buttons: [
-        // Botón para volver siempre en la misma posición (0,0)
         AACButton(
           id: 'btn_back_home',
           row: 0,
@@ -248,6 +286,7 @@ class DefaultVocabulary {
           col: 1,
           label: 'Agua',
           iconEmoji: '💧',
+          arasaacId: 2350,
           partOfSpeech: PartOfSpeech.noun,
         ),
         AACButton(
@@ -256,6 +295,7 @@ class DefaultVocabulary {
           col: 2,
           label: 'Leche',
           iconEmoji: '🥛',
+          arasaacId: 2446,
           partOfSpeech: PartOfSpeech.noun,
         ),
         AACButton(
@@ -264,6 +304,7 @@ class DefaultVocabulary {
           col: 3,
           label: 'Jugo',
           iconEmoji: '🧃',
+          arasaacId: 2440,
           partOfSpeech: PartOfSpeech.noun,
         ),
         AACButton(
@@ -272,6 +313,7 @@ class DefaultVocabulary {
           col: 0,
           label: 'Manzana',
           iconEmoji: '🍎',
+          arasaacId: 2455,
           partOfSpeech: PartOfSpeech.noun,
         ),
         AACButton(
@@ -280,6 +322,7 @@ class DefaultVocabulary {
           col: 1,
           label: 'Plátano',
           iconEmoji: '🍌',
+          arasaacId: 2465,
           partOfSpeech: PartOfSpeech.noun,
         ),
         AACButton(
@@ -288,6 +331,7 @@ class DefaultVocabulary {
           col: 2,
           label: 'Pan',
           iconEmoji: '🍞',
+          arasaacId: 2457,
           partOfSpeech: PartOfSpeech.noun,
         ),
         AACButton(
@@ -296,6 +340,7 @@ class DefaultVocabulary {
           col: 3,
           label: 'Galleta',
           iconEmoji: '🍪',
+          arasaacId: 2432,
           partOfSpeech: PartOfSpeech.noun,
         ),
         AACButton(
@@ -304,6 +349,7 @@ class DefaultVocabulary {
           col: 0,
           label: 'Pizza',
           iconEmoji: '🍕',
+          arasaacId: 2464,
           partOfSpeech: PartOfSpeech.noun,
         ),
         AACButton(
@@ -312,6 +358,220 @@ class DefaultVocabulary {
           col: 1,
           label: 'Pasta',
           iconEmoji: '🍝',
+          arasaacId: 2459,
+          partOfSpeech: PartOfSpeech.noun,
+        ),
+      ],
+    );
+  }
+
+  static AACBoard getActionsBoard() {
+    return const AACBoard(
+      id: actionsBoardId,
+      name: 'Acciones',
+      rows: 4,
+      columns: 6,
+      buttons: [
+        AACButton(
+          id: 'btn_back_home_act',
+          row: 0,
+          col: 0,
+          label: '⬅ Inicio',
+          iconEmoji: '🏠',
+          partOfSpeech: PartOfSpeech.misc,
+          actionType: ButtonActionType.backToHome,
+        ),
+        AACButton(
+          id: 'btn_correr',
+          row: 0,
+          col: 1,
+          label: 'Correr',
+          iconEmoji: '🏃',
+          arasaacId: 2382,
+          partOfSpeech: PartOfSpeech.verb,
+        ),
+        AACButton(
+          id: 'btn_dormir',
+          row: 0,
+          col: 2,
+          label: 'Dormir',
+          iconEmoji: '😴',
+          arasaacId: 2390,
+          partOfSpeech: PartOfSpeech.verb,
+        ),
+        AACButton(
+          id: 'btn_mirar',
+          row: 0,
+          col: 3,
+          label: 'Mirar',
+          iconEmoji: '👀',
+          arasaacId: 2451,
+          partOfSpeech: PartOfSpeech.verb,
+        ),
+        AACButton(
+          id: 'btn_escuchar',
+          row: 1,
+          col: 0,
+          label: 'Escuchar',
+          iconEmoji: '👂',
+          arasaacId: 2398,
+          partOfSpeech: PartOfSpeech.verb,
+        ),
+        AACButton(
+          id: 'btn_lavar',
+          row: 1,
+          col: 1,
+          label: 'Lavar',
+          iconEmoji: '🧼',
+          arasaacId: 2445,
+          partOfSpeech: PartOfSpeech.verb,
+        ),
+        AACButton(
+          id: 'btn_cantar',
+          row: 1,
+          col: 2,
+          label: 'Cantar',
+          iconEmoji: '🎤',
+          arasaacId: 2363,
+          partOfSpeech: PartOfSpeech.verb,
+        ),
+        AACButton(
+          id: 'btn_bailar',
+          row: 1,
+          col: 3,
+          label: 'Bailar',
+          iconEmoji: '💃',
+          arasaacId: 2355,
+          partOfSpeech: PartOfSpeech.verb,
+        ),
+      ],
+    );
+  }
+
+  static AACBoard getFeelingsBoard() {
+    return const AACBoard(
+      id: feelingsBoardId,
+      name: 'Emociones',
+      rows: 4,
+      columns: 6,
+      buttons: [
+        AACButton(
+          id: 'btn_back_home_feel',
+          row: 0,
+          col: 0,
+          label: '⬅ Inicio',
+          iconEmoji: '🏠',
+          partOfSpeech: PartOfSpeech.misc,
+          actionType: ButtonActionType.backToHome,
+        ),
+        AACButton(
+          id: 'btn_enojado',
+          row: 0,
+          col: 1,
+          label: 'Enojado',
+          iconEmoji: '😠',
+          arasaacId: 2951,
+          partOfSpeech: PartOfSpeech.adjective,
+        ),
+        AACButton(
+          id: 'btn_cansado',
+          row: 0,
+          col: 2,
+          label: 'Cansado',
+          iconEmoji: '🥱',
+          arasaacId: 2948,
+          partOfSpeech: PartOfSpeech.adjective,
+        ),
+        AACButton(
+          id: 'btn_asustado',
+          row: 0,
+          col: 3,
+          label: 'Asustado',
+          iconEmoji: '😨',
+          arasaacId: 2947,
+          partOfSpeech: PartOfSpeech.adjective,
+        ),
+        AACButton(
+          id: 'btn_calor',
+          row: 1,
+          col: 0,
+          label: 'Calor',
+          iconEmoji: '🥵',
+          arasaacId: 5887,
+          partOfSpeech: PartOfSpeech.adjective,
+        ),
+        AACButton(
+          id: 'btn_frio',
+          row: 1,
+          col: 1,
+          label: 'Frío',
+          iconEmoji: '🥶',
+          arasaacId: 5888,
+          partOfSpeech: PartOfSpeech.adjective,
+        ),
+      ],
+    );
+  }
+
+  static AACBoard getToysBoard() {
+    return const AACBoard(
+      id: toysBoardId,
+      name: 'Juguetes',
+      rows: 4,
+      columns: 6,
+      buttons: [
+        AACButton(
+          id: 'btn_back_home_toys',
+          row: 0,
+          col: 0,
+          label: '⬅ Inicio',
+          iconEmoji: '🏠',
+          partOfSpeech: PartOfSpeech.misc,
+          actionType: ButtonActionType.backToHome,
+        ),
+        AACButton(
+          id: 'btn_pelota',
+          row: 0,
+          col: 1,
+          label: 'Pelota',
+          iconEmoji: '⚽',
+          arasaacId: 2460,
+          partOfSpeech: PartOfSpeech.noun,
+        ),
+        AACButton(
+          id: 'btn_coche',
+          row: 0,
+          col: 2,
+          label: 'Coche',
+          iconEmoji: '🚗',
+          arasaacId: 2368,
+          partOfSpeech: PartOfSpeech.noun,
+        ),
+        AACButton(
+          id: 'btn_burbujas',
+          row: 0,
+          col: 3,
+          label: 'Burbujas',
+          iconEmoji: '🫧',
+          arasaacId: 2360,
+          partOfSpeech: PartOfSpeech.noun,
+        ),
+        AACButton(
+          id: 'btn_musica',
+          row: 1,
+          col: 0,
+          label: 'Música',
+          iconEmoji: '🎵',
+          arasaacId: 2454,
+          partOfSpeech: PartOfSpeech.noun,
+        ),
+        AACButton(
+          id: 'btn_columpio',
+          row: 1,
+          col: 1,
+          label: 'Columpio',
+          iconEmoji: '🛝',
+          arasaacId: 2371,
           partOfSpeech: PartOfSpeech.noun,
         ),
       ],

@@ -159,8 +159,8 @@ class SpanishGrammarEngine implements GrammarEngine {
       return VerbConjugations(
         infinitive: word,
         present: ['${root}o', '${root}as', '${root}a', '${root}amos', '${root}an'],
-        past: ['${root}é', '${root}aste', '${root}ó', '${root}amos', '${root}aron'],
-        future: ['${word}é', '${word}ás', '${word}á', '${word}emos', '${word}án'],
+        past: ['$rooté', '${root}aste', '$rootó', '${root}amos', '${root}aron'],
+        future: ['$wordé', '$wordás', '$wordá', '${word}emos', '$wordán'],
         gerund: '${root}ando',
         participle: '${root}ado',
         imperative: '${root}a',
@@ -170,8 +170,8 @@ class SpanishGrammarEngine implements GrammarEngine {
       return VerbConjugations(
         infinitive: word,
         present: ['${root}o', '${root}es', '${root}e', '${root}emos', '${root}en'],
-        past: ['${root}í', '${root}iste', '${root}ió', '${root}imos', '${root}ieron'],
-        future: ['${word}é', '${word}ás', '${word}á', '${word}emos', '${word}án'],
+        past: ['$rootí', '${root}iste', '${root}ió', '${root}imos', '${root}ieron'],
+        future: ['$wordé', '$wordás', '$wordá', '${word}emos', '$wordán'],
         gerund: '${root}iendo',
         participle: '${root}ido',
         imperative: '${root}e',
@@ -181,8 +181,8 @@ class SpanishGrammarEngine implements GrammarEngine {
       return VerbConjugations(
         infinitive: word,
         present: ['${root}o', '${root}es', '${root}e', '${root}imos', '${root}en'],
-        past: ['${root}í', '${root}iste', '${root}ió', '${root}imos', '${root}ieron'],
-        future: ['${word}é', '${word}ás', '${word}á', '${word}emos', '${word}án'],
+        past: ['$rootí', '${root}iste', '${root}ió', '${root}imos', '${root}ieron'],
+        future: ['$wordé', '$wordás', '$wordá', '${word}emos', '$wordán'],
         gerund: '${root}iendo',
         participle: '${root}ido',
         imperative: '${root}e',
