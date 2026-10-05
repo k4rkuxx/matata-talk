@@ -137,63 +137,115 @@ class _HeadPointerOverlayState extends State<HeadPointerOverlay> {
     }
 
     return Container(
-      width: 100,
-      height: 130,
+      width: 128,
+      height: 168,
       decoration: BoxDecoration(
         color: Colors.black,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: widget.controller.isFaceDetected ? const Color(0xFF00E676) : Colors.amber,
-          width: 2,
+          width: 2.5,
         ),
         boxShadow: const [
-          BoxShadow(color: Colors.black45, blurRadius: 8, offset: Offset(0, 3)),
+          BoxShadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 4)),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(13.5),
         child: Stack(
           fit: StackFit.expand,
           children: [
             CameraPreview(camera),
 
-            // Botón de centrado rápido y minimizar
+            // Indicador de Rostro en Esquina Superior Izquierda
             Positioned(
-              bottom: 4,
-              left: 4,
+              top: 6,
+              left: 6,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: widget.controller.isFaceDetected ? const Color(0xFF00E676) : Colors.amber,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      widget.controller.isFaceDetected ? 'OK' : 'Buscando',
+                      style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Botón de Minimizar
+            Positioned(
+              top: 4,
               right: 4,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: widget.controller.calibrateCenter,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xCC000000),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.center_focus_strong, color: Colors.white, size: 12),
-                          SizedBox(width: 3),
-                          Text('Centrar', style: TextStyle(color: Colors.white, fontSize: 9)),
-                        ],
-                      ),
-                    ),
+              child: GestureDetector(
+                onTap: () => setState(() => _pipMinimized = true),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.7),
+                    shape: BoxShape.circle,
                   ),
-                  GestureDetector(
-                    onTap: () => setState(() => _pipMinimized = true),
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xCC000000),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Icon(Icons.close, color: Colors.white70, size: 12),
+                  child: const Icon(Icons.close, color: Colors.white, size: 14),
+                ),
+              ),
+            ),
+
+            // Botón de Centrado Rápido Grande y Ergonómico
+            Positioned(
+              bottom: 6,
+              left: 6,
+              right: 6,
+              child: GestureDetector(
+                onTap: () {
+                  widget.controller.calibrateCenter();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('🎯 Centro calibrado'),
+                      duration: Duration(milliseconds: 1200),
+                      backgroundColor: Color(0xFF00897B),
                     ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00897B),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: const [
+                      BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
+                    ],
                   ),
-                ],
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.center_focus_strong, color: Colors.white, size: 14),
+                      SizedBox(width: 5),
+                      Text(
+                        'Centrar Cabeza',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],

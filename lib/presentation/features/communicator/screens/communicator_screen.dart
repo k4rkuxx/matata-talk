@@ -202,29 +202,33 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
       child: Scaffold(
           backgroundColor: const Color(0xFFECEFF1),
           appBar: AppBar(
-            titleSpacing: 12,
+            titleSpacing: 8,
             title: BlocBuilder<GridBloc, GridState>(
               builder: (context, state) {
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      'MatataTalk',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                    const Flexible(
+                      child: Text(
+                        'MatataTalk',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     const SizedBox(width: 6),
-                    Flexible(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.85),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 80),
                         child: Text(
                           state.currentBoard.name,
                           style: const TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: 11,
+                            fontSize: 10,
                             color: Color(0xFF1565C0),
                           ),
                           maxLines: 1,
@@ -239,9 +243,9 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
             actions: [
               // Botón de Frases Rápidas e Historial
               IconButton(
-                icon: const Icon(Icons.forum_outlined, size: 24),
+                icon: const Icon(Icons.forum_outlined, size: 22),
                 tooltip: 'Frases Rápidas e Historial',
-                padding: const EdgeInsets.symmetric(horizontal: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
                 constraints: const BoxConstraints(),
                 onPressed: () {
                   showDialog(
@@ -254,9 +258,9 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
               ),
               // Botón del Buscador Guiado
               IconButton(
-                icon: const Icon(Icons.search, size: 24),
+                icon: const Icon(Icons.search, size: 22),
                 tooltip: 'Buscar pictograma',
-                padding: const EdgeInsets.symmetric(horizontal: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
                 constraints: const BoxConstraints(),
                 onPressed: () {
                   showDialog(
@@ -267,74 +271,145 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
                   );
                 },
               ),
-              // Botón de Barrido por Conmutadores
+              // Menú Unificado de Métodos de Acceso & Accesibilidad
               BlocBuilder<ScanningBloc, ScanningState>(
                 builder: (context, scanState) {
-                  final isActive = scanState.settings.enabled;
-                  return IconButton(
-                    icon: Icon(
-                      Icons.accessibility_new,
-                      size: 24,
-                      color: isActive ? const Color(0xFFFF8F00) : null,
-                    ),
-                    tooltip: isActive ? 'Barrido ACTIVO — Configurar' : 'Barrido por Conmutadores',
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    constraints: const BoxConstraints(),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (dialogCtx) => BlocProvider.value(
-                          value: context.read<ScanningBloc>(),
-                          child: const ScanningSettingsDialog(),
+                  return BlocBuilder<HeadPointerBloc, HeadPointerState>(
+                    builder: (context, hpState) {
+                      final isScanActive = scanState.settings.enabled;
+                      final isHpActive = hpState.settings.enabled;
+                      final isAnyActive = isScanActive || isHpActive;
+
+                      return PopupMenuButton<String>(
+                        tooltip: 'Métodos de Acceso y Accesibilidad',
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        icon: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Icon(
+                              Icons.accessibility_new,
+                              size: 24,
+                              color: isAnyActive ? const Color(0xFF00C853) : null,
+                            ),
+                            if (isAnyActive)
+                              Positioned(
+                                top: -1,
+                                right: -1,
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF00C853),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
+                        onSelected: (value) {
+                          if (value == 'scanning') {
+                            showDialog(
+                              context: context,
+                              builder: (dialogCtx) => BlocProvider.value(
+                                value: context.read<ScanningBloc>(),
+                                child: const ScanningSettingsDialog(),
+                              ),
+                            );
+                          } else if (value == 'head_pointer') {
+                            showDialog(
+                              context: context,
+                              builder: (dialogCtx) => BlocProvider.value(
+                                value: context.read<HeadPointerBloc>(),
+                                child: HeadPointerSettingsDialog(controller: _headPointerController),
+                              ),
+                            );
+                          } else if (value == 'touch') {
+                            showDialog(
+                              context: context,
+                              builder: (dContext) => const TouchAccessibilityDialog(),
+                            );
+                          }
+                        },
+                        itemBuilder: (ctx) => [
+                          PopupMenuItem(
+                            value: 'scanning',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.settings_input_component,
+                                  color: isScanActive ? const Color(0xFFFF8F00) : Colors.grey,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                const Expanded(
+                                  child: Text('Barrido por Conmutadores', style: TextStyle(fontSize: 13)),
+                                ),
+                                if (isScanActive)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFF3E0),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Text(
+                                      'ACTIVO',
+                                      style: TextStyle(color: Color(0xFFFF8F00), fontSize: 9, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'head_pointer',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.face_retouching_natural,
+                                  color: isHpActive ? const Color(0xFF00C853) : Colors.grey,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                const Expanded(
+                                  child: Text('Puntero Cefálico (Head Tracking)', style: TextStyle(fontSize: 13)),
+                                ),
+                                if (isHpActive)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFE8F5E9),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Text(
+                                      'ACTIVO',
+                                      style: TextStyle(color: Color(0xFF00C853), fontSize: 9, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: 'touch',
+                            child: Row(
+                              children: [
+                                Icon(Icons.touch_app_outlined, color: Color(0xFF1976D2), size: 20),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: Text('Filtros Táctiles (Hold/Debounce)', style: TextStyle(fontSize: 13)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       );
                     },
-                  );
-                },
-              ),
-              // Botón de Puntero Facial / Head Tracking
-              BlocBuilder<HeadPointerBloc, HeadPointerState>(
-                builder: (context, hpState) {
-                  final isActive = hpState.settings.enabled;
-                  return IconButton(
-                    icon: Icon(
-                      Icons.face_retouching_natural,
-                      size: 24,
-                      color: isActive ? const Color(0xFF00E676) : null,
-                    ),
-                    tooltip: isActive ? 'Head Tracking ACTIVO — Configurar' : 'Control Cefálico / Head Tracking',
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    constraints: const BoxConstraints(),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (dialogCtx) => BlocProvider.value(
-                          value: context.read<HeadPointerBloc>(),
-                          child: HeadPointerSettingsDialog(controller: _headPointerController),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-              // Botón de Filtros Táctiles
-              IconButton(
-                icon: const Icon(Icons.touch_app_outlined, size: 24),
-                tooltip: 'Filtros Táctiles y Accesibilidad',
-                padding: const EdgeInsets.symmetric(horizontal: 6),
-                constraints: const BoxConstraints(),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (dContext) => const TouchAccessibilityDialog(),
                   );
                 },
               ),
               // Botón de Inicio
               IconButton(
-                icon: const Icon(Icons.home_outlined, size: 24),
+                icon: const Icon(Icons.home_outlined, size: 22),
                 tooltip: 'Ir a Inicio',
-                padding: const EdgeInsets.only(left: 6, right: 12),
+                padding: const EdgeInsets.only(left: 4, right: 8),
                 constraints: const BoxConstraints(),
                 onPressed: () {
                   _clearPathfinder(context);

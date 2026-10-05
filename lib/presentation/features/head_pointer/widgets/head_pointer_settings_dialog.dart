@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../domain/models/head_pointer_settings.dart';
@@ -24,6 +25,10 @@ class _HeadPointerSettingsDialogState extends State<HeadPointerSettingsDialog> {
   void initState() {
     super.initState();
     _draft = context.read<HeadPointerBloc>().state.settings;
+    // Si la cámara aún no ha iniciado y el motor está activo o se va a calibrar
+    if (widget.controller != null) {
+      widget.controller!.initialize();
+    }
   }
 
   @override
@@ -99,35 +104,30 @@ class _HeadPointerSettingsDialogState extends State<HeadPointerSettingsDialog> {
                       ),
                       value: _draft.enabled,
                       activeThumbColor: _kTeal,
-                      onChanged: (v) => setState(() => _draft = _draft.copyWith(enabled: v)),
+                      onChanged: (v) {
+                        setState(() => _draft = _draft.copyWith(enabled: v));
+                        if (v && widget.controller != null && !widget.controller!.isRunning) {
+                          widget.controller!.start();
+                        }
+                      },
                     ),
 
                     const Divider(height: 24),
 
-                    // Calibración Rápida
+                    // Visor de Calibración de Cabeza Grande y Prominente
                     if (_draft.enabled && widget.controller != null) ...[
-                      Center(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            widget.controller?.calibrateCenter();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('¡Centro calibrado con éxito!'),
-                                duration: Duration(seconds: 2),
-                                backgroundColor: _kTeal,
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.center_focus_strong, color: _kTeal),
-                          label: const Text('Centrar Cabeza Ahora'),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: _kTeal, width: 1.5),
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
+                      const Text(
+                        'Visor de Calibración Cefálica',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Ubica tu rostro dentro del óvalo guía en tu postura de descanso y presiona "Centrar Cabeza".',
+                        style: TextStyle(fontSize: 11, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 12),
+                      _buildCalibrationViewfinder(widget.controller!),
+                      const Divider(height: 32),
                     ],
 
                     // Slider: Tiempo de fijación (Dwell Time)
@@ -283,5 +283,166 @@ class _HeadPointerSettingsDialogState extends State<HeadPointerSettingsDialog> {
         ),
       ),
     );
+  }
+
+  Widget _buildCalibrationViewfinder(HeadPointerController controller) {
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) {
+        final camera = controller.cameraController;
+        final isCameraReady = camera != null && camera.value.isInitialized;
+        final isFaceDetected = controller.isFaceDetected;
+
+        return Column(
+          children: [
+            Container(
+              height: 220,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isFaceDetected ? const Color(0xFF00E676) : Colors.amber,
+                  width: 2.5,
+                ),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 3)),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(13.5),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (isCameraReady)
+                      Center(
+                        child: CameraPreview(camera),
+                      )
+                    else
+                      const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(color: _kTeal),
+                            SizedBox(height: 12),
+                            Text(
+                              'Iniciando visor de cámara...',
+                              style: TextStyle(color: Colors.white70, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    // Guía Ovalada de Rostro y Retícula Central
+                    CustomPaint(
+                      painter: _CalibrationGuidePainter(isDetected: isFaceDetected),
+                    ),
+
+                    // Badge de Estado Superior
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      right: 10,
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.75),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isFaceDetected ? const Color(0xFF00E676) : Colors.amber,
+                              width: 1.2,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isFaceDetected ? Icons.check_circle : Icons.warning_amber_rounded,
+                                color: isFaceDetected ? const Color(0xFF00E676) : Colors.amber,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                isFaceDetected ? 'Rostro detectado correctamente' : 'Ubica tu rostro dentro del marco',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: () {
+                controller.calibrateCenter();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('🎯 ¡Centro de cabeza calibrado con éxito!'),
+                    duration: Duration(seconds: 2),
+                    backgroundColor: Color(0xFF00897B),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.center_focus_strong, size: 22),
+              label: const Text(
+                'Centrar Cabeza Ahora',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF00897B),
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                elevation: 2,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _CalibrationGuidePainter extends CustomPainter {
+  final bool isDetected;
+
+  _CalibrationGuidePainter({required this.isDetected});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final ovalRect = Rect.fromCenter(
+      center: center,
+      width: size.width * 0.52,
+      height: size.height * 0.76,
+    );
+
+    // Óvalo guía de rostro
+    final ovalPaint = Paint()
+      ..color = (isDetected ? const Color(0xFF00E676) : Colors.white).withValues(alpha: 0.55)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2;
+    canvas.drawOval(ovalRect, ovalPaint);
+
+    // Cruz / Retícula central
+    final crossPaint = Paint()
+      ..color = (isDetected ? const Color(0xFF00E676) : Colors.amber).withValues(alpha: 0.8)
+      ..strokeWidth = 2.0;
+    canvas.drawLine(Offset(center.dx - 16, center.dy), Offset(center.dx + 16, center.dy), crossPaint);
+    canvas.drawLine(Offset(center.dx, center.dy - 16), Offset(center.dx, center.dy + 16), crossPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CalibrationGuidePainter oldDelegate) {
+    return oldDelegate.isDetected != isDetected;
   }
 }
