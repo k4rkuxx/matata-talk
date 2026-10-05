@@ -31,6 +31,10 @@ class AACButton extends Equatable {
 
   String get textToSpeak => vocalizationText ?? label;
 
+  /// Retorna true si el botón es una carpeta o navegación a otro tablero
+  bool get isFolder =>
+      actionType == ButtonActionType.navigateToBoard || targetBoardId != null;
+
   @override
   List<Object?> get props => [
         id,

@@ -18,4 +18,14 @@ class LocalVocabularyRepository implements VocabularyRepository {
   Future<void> saveButton(String boardId, AACButton button) async {
     await AppDatabase.saveButton(boardId, button);
   }
+
+  @override
+  Future<void> saveBoard(AACBoard board) async {
+    await AppDatabase.saveBoard(board);
+  }
+
+  @override
+  Future<void> saveAllBoards(Map<String, AACBoard> boards) async {
+    await AppDatabase.saveAllBoards(boards);
+  }
 }

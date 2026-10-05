@@ -32,16 +32,16 @@ class _ScanningSettingsDialogState extends State<ScanningSettingsDialog> {
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 400,
+          maxWidth: 460,
           maxHeight: screenHeight * 0.88,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ── Cabecera ──────────────────────────────────────────────────
+            // ── Cabecera Unificada (Ámbar) ───────────────────────────────
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -51,16 +51,29 @@ class _ScanningSettingsDialogState extends State<ScanningSettingsDialog> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.accessibility_new, color: Colors.white, size: 22),
-                  const SizedBox(width: 10),
+                  const Icon(Icons.settings_input_component, color: Colors.white, size: 24),
+                  const SizedBox(width: 12),
                   const Expanded(
-                    child: Text(
-                      'Barrido por Conmutadores',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Barrido por Conmutadores',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          'Control por 1 o 2 conmutadores o pantalla',
+                          style: TextStyle(color: Colors.white70, fontSize: 11),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
                   ),
                   Transform.scale(
@@ -205,28 +218,43 @@ class _ScanningSettingsDialogState extends State<ScanningSettingsDialog> {
             // ── Botones de acción (siempre visibles) ──────────────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
-              child: Row(
+              child: OverflowBar(
+                alignment: MainAxisAlignment.spaceBetween,
+                overflowAlignment: OverflowBarAlignment.end,
+                spacing: 8,
+                overflowSpacing: 8,
                 children: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: const Text('Cancelar'),
                   ),
-                  const Spacer(),
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.restore, size: 16),
-                    label: const Text('Restablecer'),
-                    onPressed: () {
-                      context
-                          .read<ScanningBloc>()
-                          .add(const ResetScanningSettings());
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    style: FilledButton.styleFrom(backgroundColor: _kAccent),
-                    onPressed: _save,
-                    child: const Text('Guardar'),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.restore, size: 16),
+                        label: const Text('Restablecer'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          textStyle: const TextStyle(fontSize: 12),
+                        ),
+                        onPressed: () {
+                          context
+                              .read<ScanningBloc>()
+                              .add(const ResetScanningSettings());
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: _kAccent,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        ),
+                        onPressed: _save,
+                        child: const Text('Guardar'),
+                      ),
+                    ],
                   ),
                 ],
               ),

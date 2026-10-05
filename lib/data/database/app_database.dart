@@ -8,7 +8,7 @@ import '../datasources/default_vocabulary.dart';
 
 class AppDatabase {
   static const String _dbName = 'matata_talk.db';
-  static const int _dbVersion = 1;
+  static const int _dbVersion = 2;
 
   static Database? _database;
 
@@ -26,11 +26,24 @@ class AppDatabase {
       path,
       version: _dbVersion,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
       onOpen: (db) async {
         // Habilitar claves foráneas
         await db.execute('PRAGMA foreign_keys = ON;');
       },
     );
+  }
+
+  static Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Resincronizar el vocabulario con las nuevas definiciones por defecto
+      await db.delete('buttons');
+      await db.delete('boards');
+      try {
+        await db.delete('vocabulary_fts');
+      } catch (_) {}
+      await _seedDefaultVocabulary(db);
+    }
   }
 
   static Future<void> _onCreate(Database db, int version) async {
@@ -211,6 +224,73 @@ class AppDatabase {
       );
     } catch (_) {
       return DefaultVocabulary.getBoardById(boardId);
+    }
+  }
+
+  /// Guarda o actualiza un tablero completo con todos sus botones
+  static Future<void> saveBoard(AACBoard board) async {
+    try {
+      final db = await database;
+      await db.transaction((txn) async {
+        await txn.insert(
+          'boards',
+          {
+            'id': board.id,
+            'name': board.name,
+            'rows': board.rows,
+            'columns': board.columns,
+            'is_system': 0,
+            'parent_board_id': null,
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+
+        // Limpiar botones antiguos de este tablero
+        await txn.delete('buttons', where: 'board_id = ?', whereArgs: [board.id]);
+        try {
+          await txn.delete('vocabulary_fts', where: 'board_id = ?', whereArgs: [board.id]);
+        } catch (_) {}
+
+        for (final button in board.buttons) {
+          await txn.insert(
+            'buttons',
+            {
+              'id': button.id,
+              'board_id': board.id,
+              'row': button.row,
+              'col': button.col,
+              'label': button.label,
+              'vocalization_text': button.vocalizationText,
+              'icon_emoji': button.iconEmoji,
+              'symbol_asset_path': button.symbolAssetPath,
+              'arasaac_id': button.arasaacId,
+              'part_of_speech': button.partOfSpeech.name,
+              'action_type': button.actionType.name,
+              'target_board_id': button.targetBoardId,
+            },
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+
+          try {
+            await txn.insert(
+              'vocabulary_fts',
+              {
+                'button_id': button.id,
+                'label': button.label.toLowerCase(),
+                'board_id': board.id,
+                'board_name': board.name,
+              },
+            );
+          } catch (_) {}
+        }
+      });
+    } catch (_) {}
+  }
+
+  /// Guarda una colección completa de tableros
+  static Future<void> saveAllBoards(Map<String, AACBoard> boards) async {
+    for (final board in boards.values) {
+      await saveBoard(board);
     }
   }
 

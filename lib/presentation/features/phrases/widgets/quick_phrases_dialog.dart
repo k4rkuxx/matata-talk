@@ -23,7 +23,8 @@ class QuickPhrasesDialog extends StatefulWidget {
 class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  QuickPhraseCategory? _selectedCategory; // null = Todas
+  QuickPhraseCategory? _selectedCategory;
+  static const Color _kThemeBlue = Color(0xFF0288D1);
 
   @override
   void initState() {
@@ -62,7 +63,7 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF1976D2),
+        backgroundColor: _kThemeBlue,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -82,9 +83,9 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Row(
             children: [
-              Icon(Icons.add_comment_rounded, color: Color(0xFF1976D2)),
+              Icon(Icons.add_comment_rounded, color: _kThemeBlue),
               SizedBox(width: 8),
-              Text('Nueva Frase Rápida', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Nueva Frase Rápida', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ],
           ),
           content: SingleChildScrollView(
@@ -106,34 +107,34 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                const Text('Selecciona un icono:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                const SizedBox(height: 8),
+                const SizedBox(height: 14),
+                const Text('Selecciona un icono:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                const SizedBox(height: 6),
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 6,
+                  runSpacing: 6,
                   children: emojis.map((e) {
                     final isSelected = selectedEmoji == e;
                     return InkWell(
                       onTap: () => setDialogState(() => selectedEmoji = e),
                       borderRadius: BorderRadius.circular(10),
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFFBBDEFB) : const Color(0xFFF0F0F0),
+                          color: isSelected ? const Color(0xFFB3E5FC) : const Color(0xFFF0F0F0),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: isSelected ? const Color(0xFF1976D2) : Colors.transparent,
+                            color: isSelected ? _kThemeBlue : Colors.transparent,
                             width: 2,
                           ),
                         ),
-                        child: Text(e, style: const TextStyle(fontSize: 22)),
+                        child: Text(e, style: const TextStyle(fontSize: 20)),
                       ),
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 16),
-                const Text('Categoría:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const SizedBox(height: 14),
+                const Text('Categoría:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 const SizedBox(height: 6),
                 DropdownButtonFormField<QuickPhraseCategory>(
                   initialValue: selectedCategory,
@@ -166,12 +167,8 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
               onPressed: () => Navigator.of(ctx).pop(),
               child: const Text('Cancelar'),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1976D2),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: _kThemeBlue),
               onPressed: () {
                 if (textController.text.trim().isNotEmpty) {
                   context.read<PhrasesBloc>().add(AddCustomQuickPhrase(
@@ -192,99 +189,123 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 580, maxHeight: 680),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Cabecera
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE3F2FD),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.forum_rounded,
-                    color: Color(0xFF1976D2),
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Frases Rápidas e Historial',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        'Comunicación inmediata y registro de habla 💙',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF1976D2),
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
+    final screenHeight = MediaQuery.of(context).size.height;
 
-            // Pestañas (Tabs)
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 460,
+          maxHeight: screenHeight * 0.88,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ── Cabecera Unificada (Celeste Azulado / Cyan Blue) ───────────
             Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFECEFF1),
-                borderRadius: BorderRadius.circular(12),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              decoration: const BoxDecoration(
+                color: _kThemeBlue,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
+              child: Row(
+                children: [
+                  const Icon(Icons.forum_rounded, color: Colors.white, size: 24),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Frases Rápidas e Historial',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          'Comunicación inmediata y registro de frases',
+                          style: TextStyle(color: Colors.white70, fontSize: 11),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Pestañas Estilizadas ─────────────────────────────────────
+            Container(
+              color: const Color(0xFFF5F9FC),
               child: TabBar(
                 controller: _tabController,
-                indicatorSize: TabBarIndicatorSize.tab,
-                indicator: BoxDecoration(
-                  color: const Color(0xFF1976D2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                labelColor: Colors.white,
-                unselectedLabelColor: const Color(0xFF455A64),
-                labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                labelColor: _kThemeBlue,
+                unselectedLabelColor: Colors.black54,
+                indicatorColor: _kThemeBlue,
+                indicatorWeight: 3,
                 tabs: const [
-                  Tab(icon: Icon(Icons.bolt_rounded, size: 18), text: 'Rápidas'),
+                  Tab(icon: Icon(Icons.flash_on_rounded, size: 18), text: 'Frases'),
                   Tab(icon: Icon(Icons.star_rounded, size: 18), text: 'Favoritas'),
                   Tab(icon: Icon(Icons.history_rounded, size: 18), text: 'Historial'),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
 
-            // Vista de las Pestañas
+            // ── Contenido Deslizable por Pestañas ─────────────────────────
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildPhrasesTab(),
+                    _buildFavoritesTab(),
+                    _buildHistoryTab(),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Divisor ───────────────────────────────────────────────────
+            const Divider(height: 1),
+
+            // ── Barra de Acciones Inferior ────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+              child: OverflowBar(
+                alignment: MainAxisAlignment.spaceBetween,
+                overflowAlignment: OverflowBarAlignment.end,
+                spacing: 8,
+                overflowSpacing: 8,
                 children: [
-                  _buildQuickPhrasesTab(),
-                  _buildFavoritesTab(),
-                  _buildHistoryTab(),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.add_comment_rounded, size: 16),
+                    label: const Text('Nueva Frase'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: _kThemeBlue,
+                      side: const BorderSide(color: _kThemeBlue),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                    onPressed: _showAddCustomPhraseDialog,
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cerrar'),
+                  ),
                 ],
               ),
             ),
@@ -295,84 +316,44 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
   }
 
   // --- PESTAÑA 1: FRASES RÁPIDAS ---
-  Widget _buildQuickPhrasesTab() {
+  Widget _buildPhrasesTab() {
     return BlocBuilder<PhrasesBloc, PhrasesState>(
       builder: (context, state) {
-        if (state.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final filtered = _selectedCategory == null
+        final phrases = _selectedCategory == null
             ? state.quickPhrases
-            : state.quickPhrases
-                .where((p) => p.category == _selectedCategory)
-                .toList();
+            : state.quickPhrases.where((p) => p.category == _selectedCategory).toList();
 
         return Column(
           children: [
-            // Filtro por Categorías
+            // Filtros por Categoría
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
                   _buildFilterChip('Todas', null),
                   ...QuickPhraseCategory.values.map(
-                    (cat) => _buildFilterChip(
-                      '${cat.emoji} ${cat.displayName}',
-                      cat,
-                    ),
+                    (cat) => _buildFilterChip('${cat.emoji} ${cat.displayName}', cat),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
 
             // Lista de Frases
             Expanded(
-              child: filtered.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('No hay frases en esta categoría', style: TextStyle(color: Colors.grey)),
-                          const SizedBox(height: 8),
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.add, size: 18),
-                            label: const Text('Agregar Frase'),
-                            onPressed: _showAddCustomPhraseDialog,
-                          ),
-                        ],
+              child: phrases.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No hay frases en esta categoría',
+                        style: TextStyle(color: Colors.grey),
                       ),
                     )
                   : ListView.builder(
-                      itemCount: filtered.length,
+                      itemCount: phrases.length,
                       itemBuilder: (context, index) {
-                        final phrase = filtered[index];
-                        return _buildPhraseCard(phrase);
+                        return _buildPhraseCard(phrases[index]);
                       },
                     ),
-            ),
-
-            // Botón inferior para agregar frase personalizada
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  icon: const Icon(Icons.add_rounded),
-                  label: const Text(
-                    '+ Crear Frase Personalizada',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: _showAddCustomPhraseDialog,
-                ),
-              ),
             ),
           ],
         );
@@ -391,16 +372,16 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.star_outline_rounded, size: 48, color: Colors.grey),
-                SizedBox(height: 8),
+                Icon(Icons.star_outline_rounded, size: 42, color: Colors.grey),
+                SizedBox(height: 6),
                 Text(
                   'No tienes frases favoritas guardadas',
-                  style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 13),
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Toca la estrella ⭐ en cualquier frase o historial para guardarla aquí',
-                  style: TextStyle(color: Colors.black54, fontSize: 12),
+                  'Toca la estrella ⭐ en cualquier frase para verla aquí',
+                  style: TextStyle(color: Colors.black54, fontSize: 11),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -427,16 +408,16 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.history_rounded, size: 48, color: Colors.grey),
-                SizedBox(height: 8),
+                Icon(Icons.history_rounded, size: 42, color: Colors.grey),
+                SizedBox(height: 6),
                 Text(
                   'Aún no hay frases habladas',
-                  style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 13),
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Las frases que construyas o pronuncies aparecerán aquí automáticamente',
-                  style: TextStyle(color: Colors.black54, fontSize: 12),
+                  'Las frases habladas se registrarán aquí automáticamente',
+                  style: TextStyle(color: Colors.black54, fontSize: 11),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -451,12 +432,15 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
               children: [
                 Text(
                   'Últimas frases habladas (${state.history.length})',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black54),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.black54),
                 ),
                 TextButton.icon(
-                  style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
-                  icon: const Icon(Icons.delete_sweep_outlined, size: 16),
-                  label: const Text('Borrar Historial', style: TextStyle(fontSize: 11)),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.redAccent,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  ),
+                  icon: const Icon(Icons.delete_sweep_outlined, size: 15),
+                  label: const Text('Borrar Todo', style: TextStyle(fontSize: 11)),
                   onPressed: () {
                     context.read<PhrasesBloc>().add(const ClearAllHistory());
                   },
@@ -482,37 +466,37 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
   Widget _buildPhraseCard(QuickPhrase phrase) {
     return Card(
       elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      margin: const EdgeInsets.symmetric(vertical: 3),
       color: const Color(0xFFF9FAFB),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: const BorderSide(color: Color(0xFFE0E0E0)),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
         leading: Container(
-          width: 42,
-          height: 42,
+          width: 38,
+          height: 38,
           decoration: BoxDecoration(
-            color: const Color(0xFFE3F2FD),
+            color: const Color(0xFFE1F5FE),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Center(
-            child: Text(phrase.iconEmoji, style: const TextStyle(fontSize: 22)),
+            child: Text(phrase.iconEmoji, style: const TextStyle(fontSize: 20)),
           ),
         ),
         title: Text(
           phrase.text,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontSize: 14,
             color: Color(0xFF1E1E1E),
           ),
         ),
         subtitle: Text(
           phrase.category.displayName,
           style: TextStyle(
-            fontSize: 11,
+            fontSize: 10,
             color: Colors.blueGrey.shade600,
             fontWeight: FontWeight.w500,
           ),
@@ -524,15 +508,20 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
               icon: Icon(
                 phrase.isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
                 color: phrase.isFavorite ? const Color(0xFFFFB300) : Colors.grey,
-                size: 24,
+                size: 22,
               ),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
               tooltip: 'Guardar en Favoritas',
               onPressed: () {
                 context.read<PhrasesBloc>().add(ToggleFavoritePhrase(phrase.text));
               },
             ),
+            const SizedBox(width: 8),
             IconButton(
-              icon: const Icon(Icons.volume_up_rounded, color: Color(0xFF1976D2), size: 24),
+              icon: const Icon(Icons.volume_up_rounded, color: _kThemeBlue, size: 22),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
               tooltip: 'Hablar frase',
               onPressed: () => _speakPhrase(phrase.text),
             ),
@@ -547,17 +536,17 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
     final timeStr = _formatTimestamp(item.spokenAt);
 
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       leading: const CircleAvatar(
-        radius: 18,
+        radius: 16,
         backgroundColor: Color(0xFFE8F5E9),
-        child: Icon(Icons.record_voice_over_rounded, color: Color(0xFF2E7D32), size: 18),
+        child: Icon(Icons.record_voice_over_rounded, color: Color(0xFF2E7D32), size: 16),
       ),
       title: Text(
         item.text,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
       ),
-      subtitle: Text(timeStr, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+      subtitle: Text(timeStr, style: const TextStyle(fontSize: 10, color: Colors.grey)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -565,18 +554,26 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
             icon: Icon(
               item.isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
               color: item.isFavorite ? const Color(0xFFFFB300) : Colors.grey,
-              size: 22,
+              size: 20,
             ),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
             onPressed: () {
               context.read<PhrasesBloc>().add(ToggleFavoritePhrase(item.text));
             },
           ),
+          const SizedBox(width: 8),
           IconButton(
-            icon: const Icon(Icons.volume_up_rounded, color: Color(0xFF1976D2), size: 22),
+            icon: const Icon(Icons.volume_up_rounded, color: _kThemeBlue, size: 20),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
             onPressed: () => _speakPhrase(item.text),
           ),
+          const SizedBox(width: 8),
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.grey, size: 20),
+            icon: const Icon(Icons.delete_outline, color: Colors.grey, size: 18),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
             onPressed: () {
               context.read<PhrasesBloc>().add(DeleteHistoryItem(item.id));
             },
@@ -592,9 +589,9 @@ class _QuickPhrasesDialogState extends State<QuickPhrasesDialog>
     return Padding(
       padding: const EdgeInsets.only(right: 6),
       child: ChoiceChip(
-        label: Text(label, style: const TextStyle(fontSize: 12)),
+        label: Text(label, style: const TextStyle(fontSize: 11)),
         selected: isSelected,
-        selectedColor: const Color(0xFFBBDEFB),
+        selectedColor: const Color(0xFFB3E5FC),
         onSelected: (_) => setState(() => _selectedCategory = category),
       ),
     );

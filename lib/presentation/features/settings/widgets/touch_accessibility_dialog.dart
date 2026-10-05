@@ -16,6 +16,7 @@ class _TouchAccessibilityDialogState extends State<TouchAccessibilityDialog> {
   late TouchSettings _tempSettings;
   int _testTapCount = 0;
   String _lastTestMessage = 'Mantén presionado o pulsa el botón de prueba';
+  static const Color _kPrimaryBlue = Color(0xFF1565C0);
 
   @override
   void initState() {
@@ -33,78 +34,73 @@ class _TouchAccessibilityDialogState extends State<TouchAccessibilityDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 520, maxHeight: 680),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Cabecera
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE3F2FD),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.touch_app_rounded,
-                    color: Color(0xFF1976D2),
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Filtros Táctiles y Accesibilidad',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        'Adaptaciones motoras para Mateo 💙',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF1976D2),
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-            const Divider(height: 16),
+    final screenHeight = MediaQuery.of(context).size.height;
 
-            // Contenido deslizable de ajustes
-            Expanded(
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 460,
+          maxHeight: screenHeight * 0.88,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ── Cabecera Unificada (Azul) ───────────────────────────────
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              decoration: const BoxDecoration(
+                color: _kPrimaryBlue,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.touch_app_rounded, color: Colors.white, size: 24),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Filtros Táctiles y Accesibilidad',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          'Filtros de retención, rebote y activación',
+                          style: TextStyle(color: Colors.white70, fontSize: 11),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Contenido Deslizable ──────────────────────────────────────
+            Flexible(
               child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Modo de Activación
-                    const Text(
-                      'Modo de Activación',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                    const SizedBox(height: 8),
+                    _sectionLabel('Modo de Activación'),
                     SizedBox(
                       width: double.infinity,
                       child: SegmentedButton<TouchActivationMode>(
@@ -123,167 +119,91 @@ class _TouchAccessibilityDialogState extends State<TouchAccessibilityDialog> {
                               fit: BoxFit.scaleDown,
                               child: Text('Al Soltar'),
                             ),
-                            icon: Icon(Icons.pan_tool_outlined, size: 18),
+                            icon: Icon(Icons.back_hand_outlined, size: 18),
                           ),
                         ],
                         selected: {_tempSettings.activationMode},
-                        onSelectionChanged: (set) {
+                        onSelectionChanged: (newSelection) {
                           setState(() {
                             _tempSettings = _tempSettings.copyWith(
-                              activationMode: set.first,
+                              activationMode: newSelection.first,
                             );
                           });
                         },
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 14),
 
                     // Tiempo de Retención (Hold Time)
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Text(
-                            'Tiempo de Retención (Hold Time)',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE3F2FD),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            _tempSettings.holdDurationMs == 0
-                                ? 'Desactivado'
-                                : '${(_tempSettings.holdDurationMs / 1000).toStringAsFixed(2)} s',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                              color: Color(0xFF1565C0),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Requiere mantener presionado para evitar toques accidentales.',
-                      style: TextStyle(fontSize: 12, color: Colors.black54),
-                    ),
+                    _sectionLabel('Tiempo de Retención: ${_tempSettings.holdDurationMs} ms'),
                     Slider(
                       value: _tempSettings.holdDurationMs.toDouble(),
                       min: 0,
                       max: 2000,
                       divisions: 20,
-                      activeColor: const Color(0xFF1976D2),
-                      label: '${(_tempSettings.holdDurationMs / 1000).toStringAsFixed(1)}s',
+                      activeColor: _kPrimaryBlue,
+                      label: '${_tempSettings.holdDurationMs} ms',
                       onChanged: (val) {
                         setState(() {
-                          _tempSettings = _tempSettings.copyWith(
-                            holdDurationMs: val.round(),
-                          );
+                          _tempSettings = _tempSettings.copyWith(holdDurationMs: val.toInt());
                         });
                       },
                     ),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 4,
-                      children: [
-                        _buildPresetChip('0s (Directo)', 0, _tempSettings.holdDurationMs, (v) {
-                          setState(() => _tempSettings = _tempSettings.copyWith(holdDurationMs: v));
-                        }),
-                        _buildPresetChip('0.2s', 200, _tempSettings.holdDurationMs, (v) {
-                          setState(() => _tempSettings = _tempSettings.copyWith(holdDurationMs: v));
-                        }),
-                        _buildPresetChip('0.5s', 500, _tempSettings.holdDurationMs, (v) {
-                          setState(() => _tempSettings = _tempSettings.copyWith(holdDurationMs: v));
-                        }),
-                        _buildPresetChip('1.0s', 1000, _tempSettings.holdDurationMs, (v) {
-                          setState(() => _tempSettings = _tempSettings.copyWith(holdDurationMs: v));
-                        }),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-
-                    // Anti-Rebote (Debounce)
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        const Expanded(
-                          child: Text(
-                            'Filtro Anti-Rebote (Debounce)',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFF3E0),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            _tempSettings.debounceDurationMs == 0
-                                ? 'Desactivado'
-                                : '${(_tempSettings.debounceDurationMs / 1000).toStringAsFixed(2)} s',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                              color: Color(0xFFE65100),
-                            ),
-                          ),
-                        ),
+                        _buildPresetChip('Inmediato (0s)', 0, _tempSettings.holdDurationMs, (v) {
+                          setState(() => _tempSettings = _tempSettings.copyWith(holdDurationMs: v));
+                        }),
+                        _buildPresetChip('0.5 seg', 500, _tempSettings.holdDurationMs, (v) {
+                          setState(() => _tempSettings = _tempSettings.copyWith(holdDurationMs: v));
+                        }),
+                        _buildPresetChip('1.0 seg', 1000, _tempSettings.holdDurationMs, (v) {
+                          setState(() => _tempSettings = _tempSettings.copyWith(holdDurationMs: v));
+                        }),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Ignora dobles pulsaciones involuntarias en el mismo botón.',
-                      style: TextStyle(fontSize: 12, color: Colors.black54),
-                    ),
+                    const SizedBox(height: 14),
+
+                    // Filtro Anti-Rebote (Debounce)
+                    _sectionLabel('Filtro Anti-Rebote: ${_tempSettings.debounceDurationMs} ms'),
                     Slider(
                       value: _tempSettings.debounceDurationMs.toDouble(),
                       min: 0,
-                      max: 1500,
-                      divisions: 15,
-                      activeColor: const Color(0xFFF57C00),
-                      label: '${(_tempSettings.debounceDurationMs / 1000).toStringAsFixed(1)}s',
+                      max: 2000,
+                      divisions: 20,
+                      activeColor: _kPrimaryBlue,
+                      label: '${_tempSettings.debounceDurationMs} ms',
                       onChanged: (val) {
                         setState(() {
-                          _tempSettings = _tempSettings.copyWith(
-                            debounceDurationMs: val.round(),
-                          );
+                          _tempSettings = _tempSettings.copyWith(debounceDurationMs: val.toInt());
                         });
                       },
                     ),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 4,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildPresetChip('Apagado', 0, _tempSettings.debounceDurationMs, (v) {
+                        _buildPresetChip('Desactivado', 0, _tempSettings.debounceDurationMs, (v) {
                           setState(() => _tempSettings = _tempSettings.copyWith(debounceDurationMs: v));
                         }),
-                        _buildPresetChip('0.3s', 300, _tempSettings.debounceDurationMs, (v) {
+                        _buildPresetChip('300 ms', 300, _tempSettings.debounceDurationMs, (v) {
                           setState(() => _tempSettings = _tempSettings.copyWith(debounceDurationMs: v));
                         }),
-                        _buildPresetChip('0.6s', 600, _tempSettings.debounceDurationMs, (v) {
-                          setState(() => _tempSettings = _tempSettings.copyWith(debounceDurationMs: v));
-                        }),
-                        _buildPresetChip('1.0s', 1000, _tempSettings.debounceDurationMs, (v) {
+                        _buildPresetChip('700 ms', 700, _tempSettings.debounceDurationMs, (v) {
                           setState(() => _tempSettings = _tempSettings.copyWith(debounceDurationMs: v));
                         }),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
-                    // Switches adicionales
+                    // Opciones de Feedback
+                    _sectionLabel('Retroalimentación'),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Animación visual de retención', style: TextStyle(fontSize: 14)),
-                      subtitle: const Text(
-                        'Muestra el círculo de carga azul durante la espera',
-                        style: TextStyle(fontSize: 12),
-                      ),
+                      dense: true,
+                      activeThumbColor: _kPrimaryBlue,
+                      title: const Text('Anillo de progreso visual', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                      subtitle: const Text('Muestra un círculo de carga durante el tiempo de retención', style: TextStyle(fontSize: 10)),
                       value: _tempSettings.showVisualHoldFeedback,
                       onChanged: (val) {
                         setState(() {
@@ -293,11 +213,10 @@ class _TouchAccessibilityDialogState extends State<TouchAccessibilityDialog> {
                     ),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Respuesta háptica (vibración)', style: TextStyle(fontSize: 14)),
-                      subtitle: const Text(
-                        'Vibración táctil al registrar exitosamente una acción',
-                        style: TextStyle(fontSize: 12),
-                      ),
+                      dense: true,
+                      activeThumbColor: _kPrimaryBlue,
+                      title: const Text('Respuesta háptica (vibración)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                      subtitle: const Text('Vibración táctil al registrar exitosamente una acción', style: TextStyle(fontSize: 10)),
                       value: _tempSettings.enableHaptics,
                       onChanged: (val) {
                         setState(() {
@@ -312,7 +231,7 @@ class _TouchAccessibilityDialogState extends State<TouchAccessibilityDialog> {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(color: Colors.black12),
                       ),
                       child: Column(
@@ -320,7 +239,7 @@ class _TouchAccessibilityDialogState extends State<TouchAccessibilityDialog> {
                         children: [
                           const Row(
                             children: [
-                              Icon(Icons.science_outlined, color: Color(0xFF1976D2), size: 18),
+                              Icon(Icons.science_outlined, color: _kPrimaryBlue, size: 18),
                               SizedBox(width: 6),
                               Text(
                                 'Área de Prueba en Vivo',
@@ -331,23 +250,23 @@ class _TouchAccessibilityDialogState extends State<TouchAccessibilityDialog> {
                           const SizedBox(height: 4),
                           Text(
                             _lastTestMessage,
-                            style: const TextStyle(fontSize: 12, color: Colors.black87),
+                            style: const TextStyle(fontSize: 11, color: Colors.black87),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 10),
                           Center(
                             child: SizedBox(
                               width: 160,
-                              height: 56,
+                              height: 52,
                               child: AccessibleTouchWrapper(
                                 settings: _tempSettings,
                                 buttonId: 'test_button_preview',
                                 onTap: _onTestTap,
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(12),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFFFE082),
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius: BorderRadius.circular(12),
                                     border: Border.all(color: Colors.black26, width: 2),
                                     boxShadow: const [
                                       BoxShadow(
@@ -361,7 +280,7 @@ class _TouchAccessibilityDialogState extends State<TouchAccessibilityDialog> {
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text('🦁', style: TextStyle(fontSize: 22)),
+                                        Text('🦁', style: TextStyle(fontSize: 20)),
                                         SizedBox(width: 8),
                                         Text(
                                           'Probar Toque',
@@ -385,74 +304,84 @@ class _TouchAccessibilityDialogState extends State<TouchAccessibilityDialog> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
 
-            // Botones de acción inferiores
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    icon: const Icon(Icons.restore_rounded, size: 18),
-                    label: const FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text('Restablecer'),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _tempSettings = TouchSettings.standard();
-                        _testTapCount = 0;
-                        _lastTestMessage = 'Ajustes restablecidos al estándar';
-                      });
-                    },
+            // ── Divisor ───────────────────────────────────────────────────
+            const Divider(height: 1),
+
+            // ── Botones de Acción Inferiores ──────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+              child: OverflowBar(
+                alignment: MainAxisAlignment.spaceBetween,
+                overflowAlignment: OverflowBarAlignment.end,
+                spacing: 8,
+                overflowSpacing: 8,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancelar'),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1976D2),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    icon: const Icon(Icons.check_circle_outline, size: 18),
-                    label: const FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'Guardar Ajustes',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    onPressed: () {
-                      context
-                          .read<TouchSettingsBloc>()
-                          .add(UpdateTouchSettings(_tempSettings));
-                      Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Ajustes de accesibilidad táctil actualizados'),
-                          backgroundColor: Color(0xFF2E7D32),
-                          duration: Duration(seconds: 2),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.restore, size: 16),
+                        label: const Text('Restablecer'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          textStyle: const TextStyle(fontSize: 12),
                         ),
-                      );
-                    },
+                        onPressed: () {
+                          setState(() {
+                            _tempSettings = TouchSettings.standard();
+                            _testTapCount = 0;
+                            _lastTestMessage = 'Ajustes restablecidos al estándar';
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: _kPrimaryBlue,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        ),
+                        onPressed: () {
+                          context
+                              .read<TouchSettingsBloc>()
+                              .add(UpdateTouchSettings(_tempSettings));
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Ajustes de accesibilidad táctil actualizados'),
+                              backgroundColor: Color(0xFF2E7D32),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                        child: const Text('Guardar'),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
+
+  Widget _sectionLabel(String text) => Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+            color: Colors.grey.shade700,
+          ),
+        ),
+      );
 
   Widget _buildPresetChip(
     String label,

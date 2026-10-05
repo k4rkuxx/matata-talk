@@ -49,7 +49,7 @@ Plan de ejecución estructurado por fases para llevar a **MatataTalk** desde el 
 ---
 
 ## 📍 Fase 5: Ecosistema, Interoperabilidad & Comunidad
-- [ ] Soporte de importación y exportación de paquetes estándar **Open Board Format (`.obf` / `.obz`)**.
+- [x] Soporte de importación y exportación de paquetes estándar **Open Board Format (`.obf` / `.obz`)** (`OpenBoardService` + `OpenBoardDialog` con compresión ZIP y serialización JSON v0.1).
 - [ ] Sistema de perfiles múltiples (soporte para terapeutas y escuelas).
 - [ ] Respaldo y restauración de perfiles en archivos locales y almacenamiento en la nube.
 - [ ] Publicación en **F-Droid** y **Google Play Store**.

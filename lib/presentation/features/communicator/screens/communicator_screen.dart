@@ -21,6 +21,7 @@ import '../../scanning/bloc/scanning_bloc.dart';
 import '../../scanning/controller/scanning_engine.dart';
 import '../../scanning/widgets/scanning_settings_dialog.dart';
 import '../../settings/widgets/touch_accessibility_dialog.dart';
+import '../../settings/widgets/open_board_dialog.dart';
 import '../../word_finder/widgets/word_finder_dialog.dart';
 
 class CommunicatorScreen extends StatefulWidget {
@@ -132,6 +133,8 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
   }
 
   void _handleButtonLongPress(BuildContext context, AACButton button) {
+    if (button.isFolder) return;
+
     if (button.partOfSpeech == PartOfSpeech.verb ||
         button.partOfSpeech == PartOfSpeech.noun ||
         button.partOfSpeech == PartOfSpeech.adjective) {
@@ -202,7 +205,7 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
       child: Scaffold(
           backgroundColor: const Color(0xFFECEFF1),
           appBar: AppBar(
-            titleSpacing: 8,
+            titleSpacing: 16,
             title: BlocBuilder<GridBloc, GridState>(
               builder: (context, state) {
                 return Row(
@@ -328,6 +331,15 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
                               context: context,
                               builder: (dContext) => const TouchAccessibilityDialog(),
                             );
+                          } else if (value == 'open_board') {
+                            showDialog(
+                              context: context,
+                              builder: (dContext) => BlocBuilder<GridBloc, GridState>(
+                                builder: (ctx, gState) => OpenBoardDialog(
+                                  currentBoard: gState.currentBoard,
+                                ),
+                              ),
+                            );
                           }
                         },
                         itemBuilder: (ctx) => [
@@ -395,6 +407,19 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
                                 SizedBox(width: 10),
                                 Expanded(
                                   child: Text('Filtros Táctiles (Hold/Debounce)', style: TextStyle(fontSize: 13)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuDivider(),
+                          const PopupMenuItem(
+                            value: 'open_board',
+                            child: Row(
+                              children: [
+                                Icon(Icons.sync_alt, color: Color(0xFF1565C0), size: 20),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: Text('Importar / Exportar (OBF/OBZ)', style: TextStyle(fontSize: 13)),
                                 ),
                               ],
                             ),

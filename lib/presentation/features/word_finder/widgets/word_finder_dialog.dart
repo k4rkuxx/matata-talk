@@ -18,12 +18,19 @@ class _WordFinderDialogState extends State<WordFinderDialog> {
   final TextEditingController _searchController = TextEditingController();
   late PathfinderService _pathfinder;
   List<WordPathResult> _results = [];
+  static const Color _kPathfinderBlue = Color(0xFF0D47A1);
 
   @override
   void initState() {
     super.initState();
     _pathfinder = PathfinderService(boards: DefaultVocabulary.allBoards);
     _loadOfflineBoards();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadOfflineBoards() async {
@@ -48,72 +55,129 @@ class _WordFinderDialogState extends State<WordFinderDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 520),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Cabecera del Buscador
-            Row(
-              children: [
-                const Icon(
-                  Icons.travel_explore_rounded,
-                  color: Color(0xFF1976D2),
-                  size: 26,
-                ),
-                const SizedBox(width: 8),
-                const Expanded(
-                  child: Text(
-                    'Buscador Guiado de Palabras',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
+    final screenHeight = MediaQuery.of(context).size.height;
 
-            // Campo de Búsqueda
-            TextField(
-              controller: _searchController,
-              autofocus: true,
-              onChanged: _onSearchChanged,
-              decoration: InputDecoration(
-                hintText: 'Escribe una palabra (ej. manzana, correr, pelota)...',
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: const Color(0xFFF0F4F8),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 460,
+          maxHeight: screenHeight * 0.88,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ── Cabecera Unificada (Azul Marino Pathfinder) ───────────────
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              decoration: const BoxDecoration(
+                color: _kPathfinderBlue,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.travel_explore_rounded, color: Colors.white, size: 24),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Buscador Guiado de Palabras',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          'Encuentra la ruta motora paso a paso',
+                          style: TextStyle(color: Colors.white70, fontSize: 11),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
 
-            // Lista de Resultados con su ruta motora
+            // ── Barra de Búsqueda ─────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+              child: TextField(
+                controller: _searchController,
+                autofocus: true,
+                onChanged: _onSearchChanged,
+                decoration: InputDecoration(
+                  hintText: 'Escribe una palabra (ej. manzana, correr, feliz)...',
+                  hintStyle: const TextStyle(fontSize: 13, color: Colors.black45),
+                  prefixIcon: const Icon(Icons.search, color: _kPathfinderBlue, size: 20),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, size: 18),
+                          onPressed: () {
+                            _searchController.clear();
+                            _onSearchChanged('');
+                          },
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: const Color(0xFFF0F4F8),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                ),
+              ),
+            ),
+
+            // ── Lista de Resultados con Ruta Motora ───────────────────────
             Expanded(
               child: _results.isEmpty
                   ? Center(
-                      child: Text(
-                        _searchController.text.isEmpty
-                            ? 'Escribe arriba para encontrar la ruta de cualquier pictograma'
-                            : 'No se encontraron palabras para "${_searchController.text}"',
-                        style: const TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
-                        textAlign: TextAlign.center,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _searchController.text.isEmpty
+                                  ? Icons.manage_search_rounded
+                                  : Icons.search_off_rounded,
+                              size: 42,
+                              color: Colors.grey.shade400,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _searchController.text.isEmpty
+                                  ? 'Escribe arriba para encontrar la ubicación y ruta motora de cualquier pictograma'
+                                  : 'No se encontraron palabras para "${_searchController.text}"',
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
                       ),
                     )
                   : ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       itemCount: _results.length,
                       separatorBuilder: (_, __) => const Divider(height: 1),
                       itemBuilder: (context, index) {
@@ -123,42 +187,43 @@ class _WordFinderDialogState extends State<WordFinderDialog> {
                         return ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           leading: Container(
-                            width: 44,
-                            height: 44,
+                            width: 42,
+                            height: 42,
                             decoration: BoxDecoration(
                               color: FitzgeraldColors.getColor(btn.partOfSpeech),
                               borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.black12),
                             ),
                             child: Center(
                               child: AACSymbolWidget(
                                 assetPath: btn.symbolAssetPath,
                                 arasaacId: btn.arasaacId,
                                 fallbackEmoji: btn.iconEmoji,
-                                size: 28,
+                                size: 26,
                               ),
                             ),
                           ),
                           title: Text(
                             btn.label,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                           ),
                           subtitle: Row(
                             children: [
-                              const Icon(Icons.alt_route_rounded, size: 14, color: Color(0xFF1976D2)),
+                              const Icon(Icons.alt_route_rounded, size: 14, color: _kPathfinderBlue),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
                                   res.pathDescription,
                                   style: const TextStyle(
-                                    fontSize: 13,
-                                    color: Color(0xFF1565C0),
-                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                    color: _kPathfinderBlue,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                          trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
                           onTap: () {
                             Navigator.of(context).pop();
                             widget.onSelectWordPath(res);
@@ -166,6 +231,23 @@ class _WordFinderDialogState extends State<WordFinderDialog> {
                         );
                       },
                     ),
+            ),
+
+            // ── Divisor ───────────────────────────────────────────────────
+            const Divider(height: 1),
+
+            // ── Botón Inferior ────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+              child: OverflowBar(
+                alignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cerrar'),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

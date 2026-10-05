@@ -48,13 +48,15 @@ class MotorGridView extends StatelessWidget {
             final isScanHighlighted = scanCursor?.isHighlighted(row, col) ?? false;
             final isRowScanHighlighted = scanCursor?.isRowHighlighted(row) ?? false;
 
+            final canLongPress = !button.isFolder && onButtonLongPress != null;
+
             return AACButtonWidget(
               button: button,
               isHighlighted: button.id == highlightedButtonId,
               isScanHighlighted: isScanHighlighted,
               isRowScanHighlighted: isRowScanHighlighted,
               onTap: () => onButtonTap(button),
-              onLongPress: onButtonLongPress != null ? () => onButtonLongPress!(button) : null,
+              onLongPress: canLongPress ? () => onButtonLongPress!(button) : null,
             );
           },
         );
