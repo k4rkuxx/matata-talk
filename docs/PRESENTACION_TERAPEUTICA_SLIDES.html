@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MatataTalk - Presentación Terapéutica y Clínica CAA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0D47A1;
+      --primary-accent: #1565C0;
+      --teal: #00897B;
+      --amber: #FF8F00;
+      --green: #2E7D32;
+      --purple: #6A1B9A;
+      --red: #C62828;
+      --dark: #0F172A;
+      --light-bg: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --border: #E2E8F0;
+      --text: #1E293B;
+      --text-muted: #64748B;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0B132B;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Container for 16:9 widescreen presentation */
+    .deck-container {
+      width: 100vw;
+      max-width: 1333px;
+      aspect-ratio: 16 / 9;
+      height: auto;
+      max-height: 90vh;
+      position: relative;
+      background: var(--light-bg);
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-aspect-ratio: 16/9) {
+      .deck-container {
+        width: 95vw;
+        height: auto;
+      }
+    }
+
+    /* Slide element */
+    .slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      transform: scale(0.98);
+      display: flex;
+      flex-direction: column;
+      background: var(--light-bg);
+      padding: 0;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1);
+      z-index: 2;
+    }
+
+    /* Header banner */
+    .slide-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-accent) 100%);
+      color: white;
+      padding: 16px 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .slide-header.green { background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%); }
+    .slide-header.purple { background: linear-gradient(135deg, #4A148C 0%, #6A1B9A 100%); }
+    .slide-header.amber { background: linear-gradient(135deg, #E65100 0%, #FF8F00 100%); }
+    .slide-header.teal { background: linear-gradient(135deg, #004D40 0%, #00897B 100%); }
+    .slide-header.red { background: linear-gradient(135deg, #B71C1C 0%, #C62828 100%); }
+
+    .slide-category {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      opacity: 0.85;
+      margin-bottom: 4px;
+    }
+
+    .slide-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .slide-body {
+      padding: 24px 36px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Cover slide */
+    .cover-slide {
+      background: radial-gradient(circle at 80% 20%, #1A365D 0%, #0A192F 100%);
+      color: white;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .cover-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #90CAF9;
+      margin-bottom: 24px;
+    }
+
+    .cover-title {
+      font-size: 54px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+      line-height: 1.1;
+    }
+
+    .cover-subtitle {
+      font-size: 22px;
+      font-weight: 600;
+      color: #90CAF9;
+      margin-bottom: 12px;
+    }
+
+    .cover-tagline {
+      font-size: 16px;
+      color: #E2E8F0;
+      max-width: 780px;
+      margin: 0 auto 36px auto;
+      line-height: 1.5;
+    }
+
+    .cover-dedication {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 235, 59, 0.4);
+      padding: 16px 28px;
+      border-radius: 16px;
+      display: inline-block;
+    }
+
+    .cover-dedication h3 {
+      font-size: 18px;
+      color: #FFEE58;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .cover-dedication p {
+      font-size: 13px;
+      color: #E2E8F0;
+    }
+
+    /* Grid cards */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      height: 100%;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      height: 100%;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .card-header.blue { border-bottom-color: var(--primary-accent); }
+    .card-header.teal { border-bottom-color: var(--teal); }
+    .card-header.amber { border-bottom-color: var(--amber); }
+    .card-header.green { border-bottom-color: var(--green); }
+    .card-header.purple { border-bottom-color: var(--purple); }
+    .card-header.red { border-bottom-color: var(--red); }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .card-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    .card-list li {
+      position: relative;
+      padding-left: 18px;
+    }
+
+    .card-list li::before {
+      content: '✦';
+      position: absolute;
+      left: 0;
+      color: var(--primary-accent);
+      font-size: 12px;
+    }
+
+    /* Feature row items */
+    .feature-row {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-left: 5px solid var(--primary-accent);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .feature-row.green { border-left-color: var(--green); }
+    .feature-row.purple { border-left-color: var(--purple); }
+    .feature-row.navy { border-left-color: var(--primary); }
+    .feature-row.amber { border-left-color: var(--amber); }
+
+    .feature-title {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feature-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .feature-clinical {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1E293B;
+      background: #F1F5F9;
+      padding: 6px 10px;
+      border-radius: 8px;
+      margin-top: 4px;
+    }
+
+    /* Comparison Table */
+    .comp-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 13px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    .comp-table th {
+      background: var(--primary);
+      color: white;
+      padding: 12px 16px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .comp-table th:first-child {
+      text-align: left;
+    }
+
+    .comp-table th.highlight {
+      background: #1565C0;
+    }
+
+    .comp-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      background: white;
+    }
+
+    .comp-table td:first-child {
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .comp-table tr:nth-child(even) td {
+      background: #F8FAFC;
+    }
+
+    .comp-table td.highlight {
+      background: #E8F5E9 !important;
+      font-weight: 700;
+      color: #1B5E20;
+    }
+
+    /* Bottom Controls */
+    .controls-bar {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100vw;
+      max-width: 1333px;
+      padding: 0 16px;
+      color: white;
+      font-size: 14px;
+    }
+
+    .nav-btn {
+      background: #1E293B;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 8px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: #334155;
+      transform: translateY(-1px);
+    }
+
+    .nav-btn.primary {
+      background: #1976D2;
+      border-color: #42A5F5;
+    }
+
+    .progress-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .dot.active {
+      background: #60A5FA;
+      width: 26px;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-container" id="deckContainer">
+
+    <!-- SLIDE 1: PORTADA -->
+    <div class="slide cover-slide active" data-index="0">
+      <div class="cover-badge">
+        <span>🦁</span> Proyecto Clínico de Código Abierto
+      </div>
+      <h1 class="cover-title">MatataTalk</h1>
+      <h2 class="cover-subtitle">Comunicación Aumentativa y Alternativa (CAA) de Nueva Generación</h2>
+      <p class="cover-tagline">Democratizando la voz, la dignidad lingüística y la autonomía para personas en el espectro autista y con necesidades complejas de comunicación.</p>
+      
+      <div class="cover-dedication">
+        <h3>💙 En honor y dedicación a Mateo Rafael ("Matata")</h3>
+        <p>Inspiración, amor y voz del proyecto · Software libre sin muros de pago</p>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: PROPÓSITO Y MISIÓN -->
+    <div class="slide" data-index="1">
+      <div class="slide-header">
+        <div>
+          <div class="slide-category">1. Fundamentos & Motivación</div>
+          <div class="slide-title">Propósito y Misión: Amor, Rigor y Tecnología Libre</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 18px;">
+          MatataTalk nace de la vivencia real de un padre que busca darle a su hijo Mateo una herramienta de comunicación equivalente a los estándares clínicos de la industria (como Proloquo2Go), pero 100% libre de barreras económicas y accesible en Android.
+        </p>
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-header blue">
+              <div>
+                <div class="card-title">💙 Mateo Rafael ("Matata")</div>
+                <div class="card-subtitle">Inspiración y Corazón</div>
+              </div>
+            </div>
+            <ul class="card-list">
+              <li>Diseñado desde la convivencia y observación clínica diaria de necesidades reales.</li>
+              <li>Enfoque en personas con autismo, dispraxia verbal y parálisis cerebral.</li>
+              <li>Prioridad absoluta en la dignidad comunicativa y la reducción de la frustración.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-header teal">
+              <div>
+                <div class="card-title">🧠 Rigor Clínico CAA</div>
+                <div class="card-subtitle">Estándares Terapéuticos</div>
+              </div>
+            </div>
+            <ul class="card-list">
+              <li>Planeación motora invariante (fija coordenadas como en un piano).</li>
+              <li>Gramática natural en español con conjugación temporal completa.</li>
+              <li>Filtros motores avanzados para absorber temblores y espasmos.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-header amber">
+              <div>
+                <div class="card-title">🌐 Tecnología Libre</div>
+                <div class="card-subtitle">Sin Muros de Pago</div>
+              </div>
+            </div>
+            <ul class="card-list">
+              <li>Construido con Flutter para compatibilidad universal con hardware accesible.</li>
+              <li>Pictogramas de ARASAAC bajo licencia pública abierta.</li>
+              <li>Interoperabilidad total con el estándar Open Board Format (.obf / .obz).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: EL DESAFÍO CLÍNICO -->
+    <div class="slide" data-index="2">
+      <div class="slide-header red">
+        <div>
+          <div class="slide-category">2. Contexto Terapéutico</div>
+          <div class="slide-title">El Desafío Clínico en el Autismo No Verbal</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+          El lenguaje oral no es la única vía para comunicarse. Las personas en el espectro autista enfrentan 4 barreras críticas que afectan su bienestar emocional:
+        </p>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header red">
+              <div>
+                <div class="card-title">1. Frustración y Meltdowns</div>
+                <div class="card-subtitle">Barrera Emocional</div>
+              </div>
+            </div>
+            <p style="font-size: 13px; margin-bottom: 8px;">La imposibilidad de comunicar dolor, hambre o sobrecarga sensorial genera altos niveles de ansiedad y crisis conductuales desreguladas.</p>
+            <div class="feature-clinical">👉 Impacto: Crisis originadas en la falta de un canal para pedir auxilio.</div>
+          </div>
+
+          <div class="card">
+            <div class="card-header red">
+              <div>
+                <div class="card-title">2. Fatiga Cognitiva</div>
+                <div class="card-subtitle">Barrera de Procesamiento</div>
+              </div>
+            </div>
+            <p style="font-size: 13px; margin-bottom: 8px;">Sistemas tradicionales obligan a escanear visualmente cada botón en posiciones cambiantes, saturando la memoria de trabajo.</p>
+            <div class="feature-clinical">👉 Impacto: Cansancio mental prematuro y abandono del comunicador.</div>
+          </div>
+
+          <div class="card">
+            <div class="card-header red">
+              <div>
+                <div class="card-title">3. Lenguaje Telegráfico</div>
+                <div class="card-subtitle">Barrera Lingüística</div>
+              </div>
+            </div>
+            <p style="font-size: 13px; margin-bottom: 8px;">Herramientas limitadas a infinitivos sueltos ("yo comer"), impidiendo expresar tiempos verbales, pasado o futuro.</p>
+            <div class="feature-clinical">👉 Impacto: Bloqueo de la autonomía expresiva y la anticipación.</div>
+          </div>
+
+          <div class="card">
+            <div class="card-header red">
+              <div>
+                <div class="card-title">4. Desafíos Motores Finos</div>
+                <div class="card-subtitle">Barrera Físico-Táctil</div>
+              </div>
+            </div>
+            <p style="font-size: 13px; margin-bottom: 8px;">Espasmos o aleteos involuntarios generan dobles toques accidentales y repeticiones no deseadas.</p>
+            <div class="feature-clinical">👉 Impacto: Frustración acústica por pulsaciones erráticas.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: FASE 1 -->
+    <div class="slide" data-index="3">
+      <div class="slide-header green">
+        <div>
+          <div class="slide-category">3. Mapeo de Roadmap & Impacto Clínico</div>
+          <div class="slide-title">Fase 1: Motor Base & Cuadrícula Motora</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="feature-row green">
+          <div class="feature-title">🎹 Invarianza Espacial (Motor Planning)</div>
+          <div class="feature-desc">Los pictogramas esenciales permanecen fijos en la misma coordenada (fila, columna) en todo momento.</div>
+          <div class="feature-clinical">🎯 Memoria Cinestésica: El cerebro automatiza el movimiento de la mano (como tocar piano), reduciendo la sobrecarga cognitiva y acelerando el habla fluida.</div>
+        </div>
+        <div class="feature-row green">
+          <div class="feature-title">🎨 Código de Colores Fitzgerald Modificado</div>
+          <div class="feature-desc">Clasificación cromática estandarizada (Verbo = Verde, Pronombre = Amarillo, Sustantivo = Naranja, Social = Rosa).</div>
+          <div class="feature-clinical">🎯 Estructuración Semántica: Facilita la comprensión de funciones gramaticales mediante anclaje visual intuitivo de alto contraste.</div>
+        </div>
+        <div class="feature-row green">
+          <div class="feature-title">🌐 Integración Oficial ARASAAC</div>
+          <div class="feature-desc">Renderizado vectorial nítido de símbolos con caché local 100% offline.</div>
+          <div class="feature-clinical">🎯 Comprensión Simbólica Universal: Facilita la transición directa entre el pictograma físico (sistema PECS) y el comunicador digital.</div>
+        </div>
+        <div class="feature-row green">
+          <div class="feature-title">🔊 Síntesis de Voz en Español (TTS)</div>
+          <div class="feature-desc">Pronunciación instantánea palabra por palabra y lectura de frase completa con entonación natural.</div>
+          <div class="feature-clinical">🎯 Círculo de Comunicación: El usuario escucha el modelo sonoro correcto de la palabra, fortaleciendo el feedback auditivo y la comprensión.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: FASE 2 -->
+    <div class="slide" data-index="4">
+      <div class="slide-header purple">
+        <div>
+          <div class="slide-category">3. Mapeo de Roadmap & Impacto Clínico</div>
+          <div class="slide-title">Fase 2: Motor Morfológico & Gramática Dinámica</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="feature-row purple">
+          <div class="feature-title">⏳ SpanishGrammarEngine (Conjugador en Español)</div>
+          <div class="feature-desc">Algoritmo lingüístico para verbos regulares (-ar, -er, -ir) e irregulares clave (querer, ir, jugar, tener, poder, estar).</div>
+          <div class="feature-clinical">🎯 Expresión Temporal Precisa: Permite comunicar no solo el presente, sino recordar vivencias pasadas ("ayer comí") o anticipar eventos futuros ("mañana jugaré"), vital para la autorregulación.</div>
+        </div>
+        <div class="feature-row purple">
+          <div class="feature-title">👆 Popup Morfológico por Pulsación Prolongada (Long-Press)</div>
+          <div class="feature-desc">Al mantener presionado un botón se despliega una matriz limpia con todas las conjugaciones y concordancias.</div>
+          <div class="feature-clinical">🎯 Economía de Pantalla: Evita llenar el tablero con decenas de botones repetidos, manteniendo la cuadrícula limpia, ordenada y motóricamente predecible.</div>
+        </div>
+        <div class="feature-row purple">
+          <div class="feature-title">✨ Pluralización y Concordancia de Género Automática</div>
+          <div class="feature-desc">Ajuste morfológico dinámico para sustantivos y adjetivos en español.</div>
+          <div class="feature-clinical">🎯 Dignidad Comunicativa: Fomenta la construcción de oraciones gramaticalmente completas y naturales ("manzanas rojas" en vez de "manzana rojo").</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: FASE 3 -->
+    <div class="slide" data-index="5">
+      <div class="slide-header">
+        <div>
+          <div class="slide-category">3. Mapeo de Roadmap & Impacto Clínico</div>
+          <div class="slide-title">Fase 3: Buscador Guiado & Frases Rápidas</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="feature-row navy">
+          <div class="feature-title">🔍 Buscador Guiado (Word Pathfinder) & Halo Azul</div>
+          <div class="feature-desc">Algoritmo que calcula la ruta motora exacta (Inicio ➔ Comida ➔ Manzana) e ilumina cada celda con un halo azul brillante.</div>
+          <div class="feature-clinical">🎯 Modelado Asistido (Aided Language): Padres y terapeutas modelan la ruta sin invadir físicamente la mano del niño, focalizando la atención visual.</div>
+        </div>
+        <div class="feature-row navy">
+          <div class="feature-title">⚡ Panel de Frases Rápidas (Quick Phrases)</div>
+          <div class="feature-desc">Acceso inmediato a necesidades fisiológicas vitales (baño, hambre, sed) y fórmulas sociales recurrentes en 1 toque.</div>
+          <div class="feature-clinical">🎯 Rescate en Crisis: En desregulación sensorial severa, un solo toque comunica la necesidad crítica sin exigir construir una frase compleja.</div>
+        </div>
+        <div class="feature-row navy">
+          <div class="feature-title">💙 Categoría Sensorial Específica</div>
+          <div class="feature-desc">Expresiones de autorregulación: "Hay mucho ruido", "Necesito descanso", "No me toques por favor".</div>
+          <div class="feature-clinical">🎯 Defensa Sensorial y Autonomía: Empodera a la persona autista a comunicar sus límites en la escuela o vía pública antes de un meltdown.</div>
+        </div>
+        <div class="feature-row navy">
+          <div class="feature-title">💾 Base de Datos Local SQLite (FTS)</div>
+          <div class="feature-desc">Indexación de vocabulario completo 100% desconectado con búsqueda instantánea de alta velocidad.</div>
+          <div class="feature-clinical">🎯 Seguridad y Continuidad: Funciona en cualquier lugar sin depender de señal celular o Wi-Fi (aulas, parques, hospitales).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: FASE 4 -->
+    <div class="slide" data-index="6">
+      <div class="slide-header amber">
+        <div>
+          <div class="slide-category">3. Mapeo de Roadmap & Impacto Clínico</div>
+          <div class="slide-title">Fase 4: Accesibilidad Universal & Métodos de Acceso</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="feature-row amber">
+          <div class="feature-title">⏱️ Filtros Táctiles (Hold Time & Debounce)</div>
+          <div class="feature-desc">Tiempo de retención configurable (0.3s-1.0s) con progreso circular y bloqueo de toques involuntarios repetitivos.</div>
+          <div class="feature-clinical">🎯 Freno a la Impulsividad: Filtra toques por roce accidental o aleteos cerca de la pantalla, enseñando causa-efecto controlada.</div>
+        </div>
+        <div class="feature-row amber">
+          <div class="feature-title">✋ Modo Activar al Soltar (Release to Activate)</div>
+          <div class="feature-desc">El botón se activa cuando el dedo se levanta de la superficie, no al tocarla por primera vez.</div>
+          <div class="feature-clinical">🎯 Exploración Táctil Segura: Permite a usuarios con debilidad visomotora deslizar el dedo sintiendo la pantalla y soltarlo en el botón deseado.</div>
+        </div>
+        <div class="feature-row amber">
+          <div class="feature-title">🎛️ Barrido por Conmutadores (Switch Scanning)</div>
+          <div class="feature-desc">Modos 1 switch (automático), 2 switches (paso a paso), barrido inverso, audiodescripción hablada y beep de baja latencia.</div>
+          <div class="feature-clinical">🎯 Inclusión Motora Extrema: Permite comunicación independiente para parálisis cerebral o discapacidad física motora severa.</div>
+        </div>
+        <div class="feature-row amber">
+          <div class="feature-title">👤 Puntero Cefálico (Head Tracking con Cámara)</div>
+          <div class="feature-desc">Seguimiento facial con Google ML Kit, filtrado anti-temblor EMA, selección por fijación visual (Dwell Click) y sonrisa.</div>
+          <div class="feature-clinical">🎯 Acceso Sin Manos: Abre un canal comunicativo completo para personas sin movilidad funcional en miembros superiores.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: FASE 5 -->
+    <div class="slide" data-index="7">
+      <div class="slide-header teal">
+        <div>
+          <div class="slide-category">3. Mapeo de Roadmap & Impacto Clínico</div>
+          <div class="slide-title">Fase 5: Ecosistema, Interoperabilidad & Publicación</div>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-header teal">
+              <div>
+                <div class="card-title">📦 Estándar Open Board Format (.obf / .obz)</div>
+                <div class="card-subtitle">Interoperabilidad Global</div>
+              </div>
+            </div>
+            <ul class="card-list">
+              <li>Exportación e importación estándar de tableros individuales (.obf) y colecciones (.obz) con compresión ZIP.</li>
+              <li>Libertad de Datos: Familias y terapeutas pueden transferir vocabularios entre escuelas, clínicas y otras aplicaciones CAA del mundo sin quedar cautivos en un software propietario.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-header teal">
+              <div>
+                <div class="card-title">👥 Sistema Multi-Perfil</div>
+                <div class="card-subtitle">Soporte Escolar y Clínico</div>
+              </div>
+            </div>
+            <ul class="card-list">
+              <li>Permite a terapeutas y educadores gestionar perfiles diferenciados para múltiples alumnos en un mismo dispositivo.</li>
+              <li>Ajustes de accesibilidad, filtros motores y vocabularios personalizados independientes para cada usuario.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-header teal">
+              <div>
+                <div class="card-title">🚀 Google Play & F-Droid</div>
+                <div class="card-subtitle">Acceso Libre Sin Costo</div>
+              </div>
+            </div>
+            <ul class="card-list">
+              <li>Publicación oficial en F-Droid (repositorio de software libre y ético) y Google Play Store.</li>
+              <li>Instalación directa, segura y sin publicidad para cualquier familia del mundo con un dispositivo Android convencional.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: COMPARATIVA -->
+    <div class="slide" data-index="8">
+      <div class="slide-header">
+        <div>
+          <div class="slide-category">4. Análisis Comparativo</div>
+          <div class="slide-title">Comparativa: MatataTalk frente a Soluciones del Mercado</div>
+        </div>
+      </div>
+      <div class="slide-body" style="padding: 18px 36px;">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Criterio Clínico / Técnico</th>
+              <th>Software Propietario (iOS)</th>
+              <th>Apps Gratuitas Genéricas</th>
+              <th class="highlight">🦁 MatataTalk</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Costo para la Familia</td>
+              <td> -  USD + iPad caro</td>
+              <td>Gratis (con anuncios / incompleta)</td>
+              <td class="highlight">100% Gratuito y Libre (Open Source)</td>
+            </tr>
+            <tr>
+              <td>Plataformas</td>
+              <td>Solo iPad / iPhone (Apple)</td>
+              <td>Android básico fragmentado</td>
+              <td class="highlight">Android Universal (y Multiplataforma)</td>
+            </tr>
+            <tr>
+              <td>Planeación Motora Invariante</td>
+              <td>✅ Sí</td>
+              <td>❌ No (listas alfabéticas)</td>
+              <td class="highlight">✅ Sí (Invarianza estricta)</td>
+            </tr>
+            <tr>
+              <td>Morfología en Español</td>
+              <td>✅ Sí</td>
+              <td>❌ No (solo infinitivos)</td>
+              <td class="highlight">✅ Sí (Conjugador y concordancia)</td>
+            </tr>
+            <tr>
+              <td>Buscador Guiado (Pathfinder)</td>
+              <td>✅ Sí</td>
+              <td>❌ No</td>
+              <td class="highlight">✅ Sí (Ruta motora paso a paso)</td>
+            </tr>
+            <tr>
+              <td>Filtros Táctiles y Accesibilidad</td>
+              <td>⚠️ Parcial</td>
+              <td>❌ No</td>
+              <td class="highlight">✅ Sí (Hold, Debounce, Release, Háptica)</td>
+            </tr>
+            <tr>
+              <td>Enfoque en Regulación Sensorial</td>
+              <td>❌ Genérico</td>
+              <td>❌ Genérico</td>
+              <td class="highlight">✅ Específico para Autismo (💙)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: CONCLUSIÓN -->
+    <div class="slide cover-slide" data-index="9">
+      <div style="background: rgba(16, 54, 105, 0.7); border: 2px solid rgba(66, 165, 245, 0.4); padding: 40px; border-radius: 20px; max-width: 960px; margin: 0 auto;">
+        <p style="font-size: 26px; font-weight: 700; color: white; line-height: 1.4; margin-bottom: 20px;">
+          “La comunicación es un derecho humano fundamental, no un privilegio costoso.”
+        </p>
+        <p style="font-size: 20px; font-style: italic; color: #B3E5FC; line-height: 1.5; margin-bottom: 28px;">
+          MatataTalk demuestra que la tecnología abierta, guiada por el amor familiar y el rigor clínico, puede transformar la vida de niños como Mateo y de miles de personas no verbales en todo el mundo.
+        </p>
+        <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
+          <h4 style="font-size: 18px; color: #FFEE58; font-weight: 700;">🦁 MatataTalk · Proyecto Libre y Abierto</h4>
+          <p style="font-size: 13px; color: #E2E8F0; margin-top: 4px;">Hecho con amor para Mateo Rafael y para cada persona que busca su propia voz.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONTROLES INFERIORES -->
+  <div class="controls-bar">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()">◀ Anterior</button>
+
+    <div class="progress-dots" id="dotsContainer"></div>
+
+    <div style="display: flex; gap: 10px;">
+      <span id="slideCounter" style="font-weight: 600; opacity: 0.85; align-self: center; margin-right: 8px;">1 / 10</span>
+      <button class="nav-btn primary" id="nextBtn" onclick="nextSlide()">Siguiente ▶</button>
+      <button class="nav-btn" onclick="toggleFullscreen()">⛶ Pantalla Completa</button>
+    </div>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const dotsContainer = document.getElementById('dotsContainer');
+    const slideCounter = document.getElementById('slideCounter');
+
+    // Create dots
+    slides.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      if (i === 0) dot.classList.add('active');
+      dot.onclick = () => goToSlide(i);
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.dot');
+
+    function updateSlide() {
+      slides.forEach((s, i) => {
+        s.classList.toggle('active', i === currentSlide);
+      });
+      dots.forEach((d, i) => {
+        d.classList.toggle('active', i === currentSlide);
+      });
+      slideCounter.textContent = ;
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function goToSlide(index) {
+      currentSlide = index;
+      updateSlide();
+    }
+
+    function toggleFullscreen() {
+      const elem = document.getElementById('deckContainer');
+      if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch(err => alert());
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      }
+    });
+  </script>
+</body>
+</html>
