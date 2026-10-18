@@ -25,6 +25,7 @@ import '../../settings/widgets/open_board_dialog.dart';
 import '../../word_finder/widgets/word_finder_dialog.dart';
 import '../../profile/bloc/profile_bloc.dart';
 import '../../profile/widgets/profile_management_dialog.dart';
+import '../../settings/widgets/backup_restore_dialog.dart';
 
 class CommunicatorScreen extends StatefulWidget {
   const CommunicatorScreen({super.key});
@@ -373,6 +374,11 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
                               context: context,
                               builder: (dContext) => const ProfileManagementDialog(),
                             );
+                          } else if (value == 'backup') {
+                            showDialog(
+                              context: context,
+                              builder: (dContext) => const BackupRestoreDialog(),
+                            );
                           }
                         },
                         itemBuilder: (ctx) => [
@@ -465,6 +471,18 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
                                 SizedBox(width: 10),
                                 Expanded(
                                   child: Text('Perfiles de Usuario', style: TextStyle(fontSize: 13)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: 'backup',
+                            child: Row(
+                              children: [
+                                Icon(Icons.cloud_sync_rounded, color: Color(0xFF00796B), size: 20),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: Text('Copia de Seguridad', style: TextStyle(fontSize: 13)),
                                 ),
                               ],
                             ),

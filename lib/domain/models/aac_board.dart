@@ -25,6 +25,30 @@ class AACBoard extends Equatable {
     }
   }
 
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'rows': rows,
+      'columns': columns,
+      'buttons': buttons.map((b) => b.toJson()).toList(),
+    };
+  }
+
+  factory AACBoard.fromJson(Map<String, dynamic> json) {
+    return AACBoard(
+      id: json['id'] as String? ?? 'board_${DateTime.now().millisecondsSinceEpoch}',
+      name: json['name'] as String? ?? 'Tablero',
+      rows: json['rows'] as int? ?? 3,
+      columns: json['columns'] as int? ?? 3,
+      buttons: (json['buttons'] as List<dynamic>?)
+              ?.map((b) => AACButton.fromJson(b as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+  }
+
   @override
   List<Object?> get props => [id, name, rows, columns, buttons];
 }

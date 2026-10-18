@@ -14,6 +14,13 @@ abstract class PhraseDataSource {
   Future<void> clearHistory();
   Future<void> toggleFavorite(String text);
   Future<Set<String>> getFavoriteTexts();
+  Future<List<QuickPhrase>> getCustomPhrasesOnly();
+  Future<void> restoreAll({
+    required List<QuickPhrase> customPhrases,
+    required List<PhraseHistoryItem> history,
+    required Set<String> favorites,
+    bool overwrite = true,
+  });
 }
 
 class SharedPreferencesPhraseDataSource implements PhraseDataSource {
@@ -272,6 +279,74 @@ class SharedPreferencesPhraseDataSource implements PhraseDataSource {
         favorites.add(text);
       }
       await prefs.setStringList(_keyFavorites, favorites.toList());
+    } catch (_) {}
+  }
+
+  @override
+  Future<List<QuickPhrase>> getCustomPhrasesOnly() async {
+    final List<QuickPhrase> customPhrases = [];
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = prefs.getStringList(_keyCustomQuickPhrases);
+      if (list != null) {
+        for (final itemStr in list) {
+          final Map<String, dynamic> map = jsonDecode(itemStr);
+          customPhrases.add(QuickPhrase.fromJson(map));
+        }
+      }
+    } catch (_) {}
+    return customPhrases;
+  }
+
+  @override
+  Future<void> restoreAll({
+    required List<QuickPhrase> customPhrases,
+    required List<PhraseHistoryItem> history,
+    required Set<String> favorites,
+    bool overwrite = true,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (overwrite) {
+        await prefs.setStringList(
+          _keyCustomQuickPhrases,
+          customPhrases.map((p) => jsonEncode(p.toJson())).toList(),
+        );
+        await prefs.setStringList(
+          _keyHistory,
+          history.map((h) => jsonEncode(h.toJson())).toList(),
+        );
+        await prefs.setStringList(_keyFavorites, favorites.toList());
+      } else {
+        final existingCustom = await getCustomPhrasesOnly();
+        final existingIds = existingCustom.map((e) => e.id).toSet();
+        for (final p in customPhrases) {
+          if (!existingIds.contains(p.id)) {
+            existingCustom.add(p);
+          }
+        }
+        await prefs.setStringList(
+          _keyCustomQuickPhrases,
+          existingCustom.map((p) => jsonEncode(p.toJson())).toList(),
+        );
+
+        final existingHistory = await getPhraseHistory();
+        final existingHistIds = existingHistory.map((h) => h.id).toSet();
+        for (final h in history) {
+          if (!existingHistIds.contains(h.id)) {
+            existingHistory.add(h);
+          }
+        }
+        existingHistory.sort((a, b) => b.spokenAt.compareTo(a.spokenAt));
+        await prefs.setStringList(
+          _keyHistory,
+          existingHistory.take(100).map((h) => jsonEncode(h.toJson())).toList(),
+        );
+
+        final existingFavs = await getFavoriteTexts();
+        existingFavs.addAll(favorites);
+        await prefs.setStringList(_keyFavorites, existingFavs.toList());
+      }
     } catch (_) {}
   }
 }
