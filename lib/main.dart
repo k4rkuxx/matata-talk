@@ -12,6 +12,8 @@ import 'presentation/features/phrases/bloc/phrases_bloc.dart';
 import 'presentation/features/head_pointer/bloc/head_pointer_bloc.dart';
 import 'presentation/features/scanning/bloc/scanning_bloc.dart';
 import 'presentation/features/settings/bloc/touch_settings_bloc.dart';
+import 'data/datasources/profile_datasource.dart';
+import 'presentation/features/profile/bloc/profile_bloc.dart';
 import 'presentation/features/splash/screens/splash_screen.dart';
 
 void main() async {
@@ -63,6 +65,12 @@ class MatataTalkApp extends StatelessWidget {
           create: (_) => HeadPointerBloc(
             dataSource: SharedPreferencesHeadPointerDataSource(),
           )..add(const LoadHeadPointerSettings()),
+        ),
+        // Perfiles de Usuario Multi-Clínicos
+        BlocProvider(
+          create: (_) => ProfileBloc(
+            repository: LocalProfileRepository(),
+          )..add(const LoadProfiles()),
         ),
       ],
       child: MaterialApp(

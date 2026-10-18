@@ -23,6 +23,8 @@ import '../../scanning/widgets/scanning_settings_dialog.dart';
 import '../../settings/widgets/touch_accessibility_dialog.dart';
 import '../../settings/widgets/open_board_dialog.dart';
 import '../../word_finder/widgets/word_finder_dialog.dart';
+import '../../profile/bloc/profile_bloc.dart';
+import '../../profile/widgets/profile_management_dialog.dart';
 
 class CommunicatorScreen extends StatefulWidget {
   const CommunicatorScreen({super.key});
@@ -259,6 +261,32 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
                   );
                 },
               ),
+              // Botón de Perfil Activo
+              BlocBuilder<ProfileBloc, ProfileState>(
+                builder: (context, pState) {
+                  final active = pState.activeProfile;
+                  final emoji = active?.avatarEmoji ?? '🦁';
+                  return IconButton(
+                    icon: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF7B1FA2).withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(emoji, style: const TextStyle(fontSize: 18)),
+                    ),
+                    tooltip: 'Perfil: ${active?.name ?? "Usuario"}',
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    constraints: const BoxConstraints(),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (dContext) => const ProfileManagementDialog(),
+                      );
+                    },
+                  );
+                },
+              ),
               // Botón del Buscador Guiado
               IconButton(
                 icon: const Icon(Icons.search, size: 22),
@@ -340,6 +368,11 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
                                 ),
                               ),
                             );
+                          } else if (value == 'profiles') {
+                            showDialog(
+                              context: context,
+                              builder: (dContext) => const ProfileManagementDialog(),
+                            );
                           }
                         },
                         itemBuilder: (ctx) => [
@@ -420,6 +453,18 @@ class _CommunicatorScreenState extends State<CommunicatorScreen> {
                                 SizedBox(width: 10),
                                 Expanded(
                                   child: Text('Importar / Exportar (OBF/OBZ)', style: TextStyle(fontSize: 13)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: 'profiles',
+                            child: Row(
+                              children: [
+                                Icon(Icons.badge_rounded, color: Color(0xFF7B1FA2), size: 20),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: Text('Perfiles de Usuario', style: TextStyle(fontSize: 13)),
                                 ),
                               ],
                             ),

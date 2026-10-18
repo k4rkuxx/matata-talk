@@ -1,3 +1,8 @@
+import 'dart:convert';
+import '../../domain/models/user_profile.dart';
+import '../../domain/models/touch_settings.dart';
+import '../../domain/models/scanning_settings.dart';
+import '../../domain/models/head_pointer_settings.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 import '../../domain/models/aac_board.dart';
@@ -8,7 +13,7 @@ import '../datasources/default_vocabulary.dart';
 
 class AppDatabase {
   static const String _dbName = 'matata_talk.db';
-  static const int _dbVersion = 2;
+  static const int _dbVersion = 3;
 
   static Database? _database;
 
@@ -43,6 +48,10 @@ class AppDatabase {
         await db.delete('vocabulary_fts');
       } catch (_) {}
       await _seedDefaultVocabulary(db);
+    }
+    if (oldVersion < 3) {
+      await _createProfilesTable(db);
+      await _seedDefaultProfile(db);
     }
   }
 
@@ -102,6 +111,10 @@ class AppDatabase {
 
     // 5. Poblar con el vocabulario clínico por defecto
     await _seedDefaultVocabulary(db);
+
+    // 6. Tabla y datos de Perfiles Clínicos
+    await _createProfilesTable(db);
+    await _seedDefaultProfile(db);
   }
 
   static Future<void> _seedDefaultVocabulary(Database db) async {
@@ -340,4 +353,164 @@ class AppDatabase {
       targetBoardId: r['target_board_id'] as String?,
     );
   }
+
+  static Future<void> _createProfilesTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS profiles (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        avatar_emoji TEXT NOT NULL,
+        root_board_id TEXT NOT NULL,
+        notes TEXT,
+        touch_settings_json TEXT NOT NULL,
+        scanning_settings_json TEXT NOT NULL,
+        head_pointer_settings_json TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS app_metadata (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      );
+    ''');
+  }
+
+  static Future<void> _seedDefaultProfile(Database db) async {
+    final defaultProf = UserProfile.defaultProfile();
+    await db.insert(
+      'profiles',
+      {
+        'id': defaultProf.id,
+        'name': defaultProf.name,
+        'avatar_emoji': defaultProf.avatarEmoji,
+        'root_board_id': defaultProf.rootBoardId,
+        'notes': defaultProf.notes,
+        'touch_settings_json': jsonEncode(defaultProf.touchSettings.toJson()),
+        'scanning_settings_json': jsonEncode(defaultProf.scanningSettings.toJson()),
+        'head_pointer_settings_json': jsonEncode(defaultProf.headPointerSettings.toJson()),
+        'created_at': defaultProf.createdAt.toIso8601String(),
+        'updated_at': defaultProf.updatedAt.toIso8601String(),
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+
+    await db.insert(
+      'app_metadata',
+      {
+        'key': 'active_profile_id',
+        'value': defaultProf.id,
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+  }
+
+  // --- MÉTODOS PÚBLICOS DE PERFILES ---
+
+  /// Obtiene todos los perfiles de usuario registrados
+  static Future<List<UserProfile>> getAllProfiles() async {
+    try {
+      final db = await database;
+      final rows = await db.query('profiles', orderBy: 'created_at ASC');
+      if (rows.isEmpty) {
+        final def = UserProfile.defaultProfile();
+        await saveProfile(def);
+        return [def];
+      }
+      return rows.map((r) => _mapToProfile(r)).toList();
+    } catch (_) {
+      return [UserProfile.defaultProfile()];
+    }
+  }
+
+  /// Obtiene un perfil específico por ID
+  static Future<UserProfile?> getProfile(String id) async {
+    try {
+      final db = await database;
+      final rows = await db.query('profiles', where: 'id = ?', whereArgs: [id], limit: 1);
+      if (rows.isEmpty) return null;
+      return _mapToProfile(rows.first);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Guarda o actualiza un perfil de usuario
+  static Future<void> saveProfile(UserProfile profile) async {
+    try {
+      final db = await database;
+      await db.insert(
+        'profiles',
+        {
+          'id': profile.id,
+          'name': profile.name,
+          'avatar_emoji': profile.avatarEmoji,
+          'root_board_id': profile.rootBoardId,
+          'notes': profile.notes,
+          'touch_settings_json': jsonEncode(profile.touchSettings.toJson()),
+          'scanning_settings_json': jsonEncode(profile.scanningSettings.toJson()),
+          'head_pointer_settings_json': jsonEncode(profile.headPointerSettings.toJson()),
+          'created_at': profile.createdAt.toIso8601String(),
+          'updated_at': profile.updatedAt.toIso8601String(),
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (_) {}
+  }
+
+  /// Elimina un perfil por ID (no permite eliminar si es el único)
+  static Future<bool> deleteProfile(String id) async {
+    try {
+      final db = await database;
+      final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM profiles')) ?? 0;
+      if (count <= 1) return false;
+
+      await db.delete('profiles', where: 'id = ?', whereArgs: [id]);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Obtiene el ID del perfil actualmente activo
+  static Future<String> getActiveProfileId() async {
+    try {
+      final db = await database;
+      final rows = await db.query('app_metadata', where: 'key = ?', whereArgs: ['active_profile_id'], limit: 1);
+      if (rows.isNotEmpty) {
+        return rows.first['value'] as String;
+      }
+    } catch (_) {}
+    return 'profile_default';
+  }
+
+  /// Establece el ID del perfil activo
+  static Future<void> setActiveProfileId(String id) async {
+    try {
+      final db = await database;
+      await db.insert(
+        'app_metadata',
+        {'key': 'active_profile_id', 'value': id},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (_) {}
+  }
+
+  static UserProfile _mapToProfile(Map<String, dynamic> r) {
+    return UserProfile(
+      id: r['id'] as String,
+      name: r['name'] as String,
+      avatarEmoji: r['avatar_emoji'] as String? ?? '👤',
+      rootBoardId: r['root_board_id'] as String? ?? 'home_board',
+      notes: r['notes'] as String? ?? '',
+      touchSettings: TouchSettings.fromJson(jsonDecode(r['touch_settings_json'] as String)),
+      scanningSettings: ScanningSettings.fromJson(jsonDecode(r['scanning_settings_json'] as String)),
+      headPointerSettings: HeadPointerSettings.fromJson(jsonDecode(r['head_pointer_settings_json'] as String)),
+      createdAt: DateTime.tryParse(r['created_at'] as String) ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(r['updated_at'] as String) ?? DateTime.now(),
+    );
+  }
+
 }
